@@ -1,0 +1,154 @@
+# Default values for push-gateway.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+service:
+  useGatewayAPI: true
+
+###########
+# Backend #
+###########
+backend:
+  image:
+    repository: "k3d-registry.localhost:5001/push-gateway-backend"
+    pullPolicy: Always
+    tag: "v0.0.1"
+  config:
+    debug: false
+    tracing:
+      enabled: false
+      jaeger:
+        endpoint: "" # set if enabled
+    metrics:
+      enabled: false
+      otlp:
+        endpoint: ""
+        protocol: ""
+        step: "30s"
+
+pushConfig:
+  apns:
+    configs: []
+  firebase:
+    configs: []
+
+producer:
+  hostname: push
+  internHostName: push-producer.svc.cluster.local
+  resources:
+    limits:
+      memory: 1024M
+      cpu: 1000m
+    requests:
+      memory: 1024M
+      cpu: 200m
+
+consumer:
+  hostname: push
+  internHostName: push-consumer.svc.cluster.local
+  resources:
+    limits:
+      memory: 1024M
+      cpu: 1000m
+    requests:
+      memory: 1024M
+      cpu: 200m
+
+#######
+# JMS #
+#######
+jms:
+  broker:
+    host: ""
+    port: 61616
+    image:
+      repository: "apache/activemq-artemis"
+      pullPolicy: IfNotPresent
+      tag: "2.44.0"
+    resources:
+      limits:
+        memory: 1024M
+        cpu: 1000m
+      requests:
+        memory: 1024M
+        cpu: 200m
+
+##############
+# PostgreSQL #
+##############
+postgres:
+  enabled: false
+  image: "postgres:16"
+  database: "pgw"
+  jdbc: jdbc:postgresql://{{ include "push-gateway.fullname" . }}-postgres:5432/pgw
+
+ingress:
+  enabled: true
+  className: "internal"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: "true"
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+
+# Pod Security Context - applies to all containers in a Pod
+podSecurityContext:
+  # The GID to tell the Kubelet to modify permissions of a volume owned by a pod
+  fsGroup: 10001
+  # Determines when to apply fsGroup actions - "Always" is the default
+  fsGroupChangePolicy: "OnRootMismatch"
+  # Which GID container process is assigned
+  runAsGroup: 10001
+  # Determine whether container process starts as root (UID 0)
+  runAsNonRoot: true
+  # Which UID container process is assigned
+  runAsUser: 10001
+
+# Container Security Context for a single container - Takes precedence over PodSecurityContext
+securityContext:
+  #defines whether container can be granted privileges beyond the parent process spawing the process
+  allowPrivilegeEscalation: false
+  #Define whether the container has privileged access e.g. CAP_SYS_ADMIN capability and SELinux spc_t type
+  privileged: false
+  #Usually no longer required. Determines whether /proc is masked to the container. Do not mount /proc from a host to a container
+  procMount: Default
+  # The SELinux context to be applied to the container. Must not be explicitly set to Unconfined.
+  seccompProfile:
+    type: "RuntimeDefault"
+  #Which GID container process is assigned
+  runAsGroup: 10001
+  # Determine whether container process starts as root (UID 0)
+  runAsNonRoot: true
+  #Which UID container process is assigned
+  runAsUser: 10001
+  # Sets the file system as read-only
+  readOnlyRootFilesystem: true
+  #Ability to remove and /or add Linux Capabilities
+  capabilities:
+    drop: ["ALL"]
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80

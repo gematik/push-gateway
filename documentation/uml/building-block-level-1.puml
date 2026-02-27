@@ -1,0 +1,22 @@
+@startuml
+
+component "Push-Gateway" <<System>> as pgw {
+
+    component "REST-Api-Server" <<Subsystem>> as api
+    component "Message-Broker" <<Subsystem>> as broker
+    component "Message-Consumer" <<Subsystem>> as consumer
+
+    port "APNS" as portApns
+    port "Firebase" as portFirebase
+    port "Fachdienst" as fachdienst
+
+    ' connections
+    fachdienst ..> api : http
+    api ..> broker : JMS
+    consumer ..> broker : JMS
+
+    consumer ..> portApns : http
+    consumer ..> portFirebase : http
+}
+
+@enduml

@@ -1,0 +1,23 @@
+licenses:
+  - id: GPL-2.0-only
+  - id: GPL-2.0-or-later
+  - id: LGPL-2.1-or-later
+  - id: MPL-2.0
+  - id: GPL-2.0-with-classpath-exception
+misconfigurations:
+  - id: KSV027
+  - id: KSV013
+  - id: KSV110
+vulnerabilities:
+  - id: CVE-2025-26519
+  - id: CVE-2024-58251
+  - id: CVE-2025-46394
+  - id: CVE-2025-15467
+    expired_at: 2026-03-28
+    statement: not fixable in Alpine 3.22, only fixable with a Base Image Update, which is not available by OSADL
+  - id: CVE-2025-69419
+    expired_at: 2026-03-28
+    statement: not fixable in Alpine 3.22, only fixable with a Base Image Update, which is not available by OSADL
+  - id: CVE-2025-69421
+    expired_at: 2026-03-28
+    statement: not fixable in Alpine 3.22, only fixable with a Base Image Update, which is not available by OSADL

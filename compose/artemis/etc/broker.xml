@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns="urn:activemq:core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="urn:activemq:core http://activemq.apache.org/schema/core">
+
+    <!-- Basis-Broker-Konfiguration -->
+    <core>
+        <name>artemis-broker</name>
+        <persistence-enabled>true</persistence-enabled>
+        <journal-type>NIO</journal-type>
+        <security-enabled>true</security-enabled>
+
+        <!-- Acceptor für JMS -->
+        <acceptors>
+            <acceptor name="artemis">tcp://0.0.0.0:61616</acceptor>
+        </acceptors>
+
+        <!-- Benutzerdefinierte Queues -->
+        <addresses>
+            <address name="pending.notifications.apns.plain">
+                <anycast>
+                    <queue name="pending.notifications.apns.plain"/>
+                </anycast>
+            </address>
+            <address name="pending.notifications.apns.encrypted">
+                <anycast>
+                    <queue name="pending.notifications.apns.encrypted"/>
+                </anycast>
+            </address>
+            <address name="pending.notifications.firebase.plain">
+                <anycast>
+                    <queue name="pending.notifications.firebase.plain"/>
+                </anycast>
+            </address>
+            <address name="pending.notifications.firebase.encrypted">
+                <anycast>
+                    <queue name="pending.notifications.firebase.encrypted"/>
+                </anycast>
+            </address>
+        </addresses>
+
+        <address-settings>
+            <address-setting match="#">
+                <auto-create-queues>false</auto-create-queues>
+                <auto-create-addresses>false</auto-create-addresses>
+                <dead-letter-address>none</dead-letter-address>
+                <max-delivery-attempts>1440</max-delivery-attempts>
+                <redelivery-delay>60000</redelivery-delay>
+            </address-setting>
+        </address-settings>
+
+        <security-settings>
+            <security-setting match="#">
+                <permission type="send" roles="amq"/>
+                <permission type="consume" roles="amq"/>
+            </security-setting>
+        </security-settings>
+
+    </core>
+</configuration>

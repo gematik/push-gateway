@@ -1,0 +1,7 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-architecture-constraints]]
+== Randbedingungen
+Entwicklungsumgebung:: Es ist die Entwicklungsumgebung des Kunden zu nutzen, insbesondere gitlab (Repositories) und Jenkins (Continuous Integration). Dies bedingt Zugänge zu den entsprechenden Systemen für die beteiligten Entwickler, siehe <<stakeholder, Stakeholder>>.
+
+Betrieb:: Das System soll in einer bestimmten Betriebsumgebung betrieben werden, konkret in den google-Kubernetes-Umgebungen der gematik. Dies bedingt die Bereitstellung des Systems in Form von Docker-Images mit geeigneten Deploymentskripten in Form von Helm-Charts.

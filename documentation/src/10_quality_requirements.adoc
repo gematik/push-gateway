@@ -1,0 +1,51 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-quality-scenarios]]
+== Qualitätsanforderungen
+
+Das zu entwickelnde Push Gateway verfolgt die folgenden Ziele:
+
+1.	Schaffung einer einheitlichen Fassade für die proprietären Schnittstellen von iOS (APNS) und Android (Firebase)
+2.	Entkoppelung der Fachdienste von technischen Details und zu erwartenden Änderungen an den proprietären Schnittstellen von iOS (APNS) und Android (Firebase)
+3. Umsetzung der in <<section-context-and-scope, Kapitel Kontext und Scope>> genannten AFOs
+4. Unterstützung der Maximallast von 10.000 Notifications pro Stunde
+
+Daraus ergibt sich der folgende Qualtätsbaum nach <<iso25010>>:
+[[qualitaetsbaum]]
+[plantuml,qualitaetsbaum,svg,align="center",scale=95]
+.Qualitätsbaum
+....
+include::../uml/quality-tree.puml[]
+....
+
+=== Qualitätsszenarien
+
+Die Erreichung der genannten <<Ziele>> wird durch die folgenden Qualitätsszenarien prüfbar.
+
+==== Szenario FEKO01 [[FEKO01]]
+Stimulus:: In der <<spec,Spezifikation>> werden eine oder mehrere Anforderungen, so genannte AFOs, spezifiziert.
+Quelle:: Fachabteilung/Product Owner
+Artefakt:: Anwendungslogik und zugehörige Schnittstellen
+Umgebung:: Produktionsnahes Entwicklungs- oder Testsystem während der Weiterentwicklung
+Antwort:: Die Änderungen werden implementiert, getestet und bereitgestellt, ohne bestehende Funktionalitäten unbeabsichtigt zu beeinflussen.
+Antwortmetrik:: Die Umsetzung ist fachlich korrekt und erzeugt das gewünschte Verhalten.
+
+==== Szenario FEVO01 [[FEVO01]]
+Stimulus:: In der <<spec,Spezifikation>> werden eine oder mehrere Anforderungen, so genannte AFOs, spezifiziert.
+Quelle:: Fachabteilung/Product Owner
+Artefakt:: Anwendungslogik und zugehörige Schnittstellen
+Umgebung:: Produktionsnahes Entwicklungs- oder Testsystem während der Weiterentwicklung
+Antwort:: Alle relevanten Änderungen werden implementiert, getestet und bereitgestellt, ohne bestehende Funktionalitäten unbeabsichtigt zu beeinflussen.
+Antwortmetrik:: Die Umsetzung ist vollständig und erzeugt das gewünschte Verhalten.
+
+==== Szenario EFZV01 [[EFZV01]]
+Stimulus:: Das System empfängt innerhalb einer Stunde insgesamt 10.000 Push-Notification-Requests.
+Quelle:: Fachdienste
+Artefakte:: REST-Api-Server, Broker, JMS-Consumer
+Umgebung:: Produktionsbetrieb unter Normalbedingungen oder produktionsnahe Testumgebung
+Antwort:: Das System verarbeitet alle eingehenden Requests fachlich korrekt und vollständig, ohne die vereinbarten Service-Qualitäten zu verletzen.
+Antwortmetrik:: Aus dem Log und/oder den Telemetriedaten des Systems ist ersichtlich, dass 10.000 Requests pro Stunde verarbeitet werden. Das System lehnt keine Requests aufgrund von Überlast ab.
+Anmerkungen::
+* Da sich die eigentliche Zustellung von Notifications an Endgeräte der Kontrolle des Systems entzieht, muss an dieser Stelle darauf verzichtet werden erfolgreiche Zustellungen für die Erfüllung des Szenarios zu Grunde zu legen. Es kann lediglich die erfolgreich quittierte Ablieferung bei beteiligten Push-Providern geltend gemacht werden, sofern die Fachlichkeit dies hergibt.
+* Lasttests im Modul _loadtests_ stellen die Erfüllung dieses Szenarios sicher.
+** Falls gegen echte Push-Provider getestet wird, sind ferner bei den beteiligten Push-Providern geeignete Rate-Limits sicherzustellen, die der hohen Anzahl von Nachrichten gerecht werden.

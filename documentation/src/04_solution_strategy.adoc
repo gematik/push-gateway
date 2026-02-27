@@ -1,0 +1,57 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-solution-strategy]]
+== Lösungsstrategie
+
+=== Einführung
+Die Basis des Systems bilden die folgenden Komponenten:
+
+* Formal beschriebene REST-Api als Zugangspunkt für Fachdienste, siehe <<openapi>>
+* Filterung formal zustellbarer Push-Notifications
+* Persistenz zur Speicherung abgelehnter Pushkeys
+* Pufferung und Retry-Mechanismen für formal zustellbare Push-Notifications
+* Verarbeitung formal zustellbarer Push-Notifications
+
+=== Architekturstil
+Das System ist ein Baustein innerhalb einer deutlich größeren verteilten Infrastruktur. Als Vermittler zwischen Fachdiensten und Push-Providern muss es für Fachdienste erreichbar sein und selbst Zugriff auf die Push-Provider haben, um seine Aufgaben erledigen zu können. Es handelt sich daher um ein verteiltes Client-Server-System, wobei die Fachdienste die Client-Rolle gegenüber dem System einnehmen und das System die Client-Rolle gegenüber den Push-Providern.
+
+=== REST
+Die Anforderungen der gematik schließen die Implementierung einer eigens definierten REST-Api ein. Andere Ansätze, wie etwa SOAP oder ähnliches scheiden daher aus. Ferner ermöglicht die zustandslose Kommunikation von REST-Systemen eine besonders gute Skalierung was insbesondere die Erfüllung von <<EFZV01>> begünstigt.
+
+=== Persistenz
+Für die Filterung von unzustellbaren Push-Notifications muss es u. A. Aufzeichnungen von bereits abgelehnten Pushkeys geben. Zu diesem Zweck wird eine relationale Datenbank (postgreSQL) vom Kunden gewünscht.
+
+Anmerkung:: Da es in diesem Szenario keine Relationen gibt, ist ein relationales DB-System nicht unbedingt erste Wahl. Daher wurde der Einsatz einer NoSQL-DB (Mongo-DB) mit dem Kunden diskutiert, aber aus betrieblichen Gründen abgelehnt.
+
+== Technologiestack
+Die folgenden Technologien kommen in diesem System zum Einsatz:
+
+[discrete]
+=== Programmiersprachen
+Es wird Kotlin als Programmiersprache verwendet und gegenüber Java bevorzugt. Java ist weit verbreitet, bietet ein großartiges Ecosystem und eine ausführliche Dokumentation. Die Sprache Kotlin ist mit Java zu 100 % interoperabel und macht einige Dinge besser als Java. NullPointerExceptions sind eine häufige Fehlerquelle in Java-Programmen. Sie sind in Java sehr einfach zu produzieren. In Kotlin müssen Felder, die `null` sein dürfen, explizit als solche markiert werden. Das Typsystem stellt sicher, dass `null` nur dort auftreten kann. NullPointerExceptions sind so viel schwieriger zu produzieren als in Java. Ein weiterer Grund für Kotlin ist die Erweiterbarkeit durch sogenannte Extensions. Diese ermöglichen die Erweiterung von Funktionalität, ohne auf Vererbung angewiesen zu sein. So kann man Bibliotheken, die man nicht unter Kontrolle hat, um projektspezifisches Verhalten ergänzen. In Java ist dies nicht möglich. Ein dritter Vorteil von Kotlin ist, dass alles implizit unveränderbar ist (_final_, _immutable_), anders als in Java. Dadurch können ungewollte Seiteneffekte reduziert werden.
+
+[discrete]
+=== Backend
+Im Backend kommt Spring Boot als Application Framework zum Einsatz. Mit seiner hohen Modularität und Adaptierbarkeit vereinfacht es die Anbindung anderer Technologien erheblich. Die Bereitstellung von Telemetriedaten der Anwendung wird ebenfalls sehr gut unterstützt.
+
+[discrete]
+=== Persistenz
+Die Persistenzschicht wird benötigt um Gültigkeitsstatus bzgl. Pushkeys zu speichern und für Folgerequests zu verwenden. Da hier keine Relationen gegeben sind, ist eine relationales DBMS eigentlich nicht notwendig. Mit Verweis auf <<adr002,ADR-002>> haben wir uns dennoch für PostgreSQL entschieden.
+
+Die Konformität mit der ISO 9075 ist zu gut 96 % gegeben (siehe <<postgresql-iso9075-conformance>>) was einen späteren Wechsel des DMBS erschweren kann. Die Portabilität der Datenbank ist jedoch weder implizit noch explizit gefordert, sodass dieser Umstand wenig Gewicht hat.
+
+[discrete]
+==== Migration
+Um Schemaänderungen nachvollziehbar und reproduzierbar zu halten, wird ein Datenbankmigrationswerkzeug verwendet. Wegen der geringeren Komplexität und keinem zu erwartenden Wechsel des DMBS wird der Einsatz von _Flyway_ gegenüber _Liquibase_ bevorzugt.
+
+[discrete]
+=== Pufferung
+Für die Entkopplung von Requestverarbeitung und Nachrichtenversand kommt ein JMS-Broker zum Einsatz. Dies ermöglicht die gezielte Skalierung überlasteter Komponenten (REST-Api-Server, JMS-Consumer) sowie die Umsetzung von Retries, wenn fachlich erforderlich. Die Payloads landen in Queues, die von JMS-Consumern geordnet abgearbeitet werden. Die Integration mit Spring Boot ist bei Apache Artemis straight-forward, weshalb diese Broker-Implementierung verwendet wird. Der Einsatz von Google's Äquivalent wurde diskutiert, aus Zeitgründen aber verworfen, da die JMS-Variante zum Zeitpunkt der Diskussion bereits fertiggestellt war.
+
+[discrete]
+=== Buildtool
+Aufgrund von bereits vorhandenem Knowhow beim Auftragnehmer kommt Maven zum Einsatz. Gradle würde jedoch ebenfalls funktionieren.
+
+[discrete]
+=== Code-Generierung
+Die gematik stellt eine OpenAPI-Spec bereit, die implementiert werden muss. Die REST-Schnittstelle wird daher aus dieser OpenAPI-Spec generiert und per Delegation implementiert.

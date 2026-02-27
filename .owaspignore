@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+   <suppress>
+     <notes><![CDATA[
+         This suppresses all CVE entries that have a score below CVSS 5.
+       ]]></notes>
+     <cvssBelow>5</cvssBelow>
+   </suppress>
+   <suppress until="2026-03-31">
+     <cve>CVE-2023-43810</cve>
+     <cve>CVE-2023-45142</cve>
+     <cve>CVE-2023-47108</cve>
+     <cve>CVE-2025-55163</cve>
+     <cve>CVE-2025-26519</cve>
+     <cve>CVE-2025-13151</cve>
+     <cve>CVE-2025-11187</cve>
+     <cve>CVE-2025-15467</cve>
+     <cve>CVE-2025-15468</cve>
+     <cve>CVE-2025-15469</cve>
+     <cve>CVE-2025-66199</cve>
+     <cve>CVE-2025-68160</cve>
+     <cve>CVE-2025-69418</cve>
+     <cve>CVE-2025-69419</cve>
+     <cve>CVE-2025-69420</cve>
+     <cve>CVE-2025-69421</cve>
+     <cve>CVE-2026-21925</cve>
+     <cve>CVE-2026-21932</cve>
+     <cve>CVE-2026-21933</cve>
+     <cve>CVE-2026-21945</cve>
+     <cve>CVE-2026-22795</cve>
+     <cve>CVE-2026-22796</cve>
+     <cve>CVE-2025-67735</cve>
+  </suppress>
+   <suppress until="2026-01-31">
+     <cve>CVE-2025-7962</cve>
+  </suppress>
+  <suppress until="2026-03-28">
+    <cve>CVE-2025-15467</cve>
+    <cve>CVE-2025-69419</cve>
+    <cve>CVE-2025-69421</cve>
+  </suppress>
+</suppressions>

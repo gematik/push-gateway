@@ -1,0 +1,51 @@
+{{ if .Values.postgres.enabled }}
+{{ $fullName := include "push-gateway.fullname" . }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $fullName }}-postgres
+  template:
+    metadata:
+      labels:
+        app: {{ $fullName }}-postgres
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: postgres
+          image: {{ .Values.postgres.image }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "postgres-admin"
+                  key: "username"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "postgres-admin"
+                  key: "password"
+            - name: POSTGRES_DB
+              value:  {{ .Values.postgres.database }}
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: "pgdata"
+              mountPath: "/var/lib/postgresql/data"
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 5
+      volumes:
+        - name: "pgdata"
+          persistentVolumeClaim:
+            claimName: "pgdata-pvc"
+{{ end }}

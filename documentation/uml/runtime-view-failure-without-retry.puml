@@ -1,0 +1,38 @@
+@startuml
+
+!pragma teoz true
+
+participant "Fachdienst" as fd
+participant "Backend" as backend
+participant "Broker" as broker
+participant "Push-Provider" as pp
+participant "Push-Receiver" as device
+
+activate fd
+fd -> backend : POST /notify
+
+activate backend
+backend --> backend: evaluate payload
+backend --> backend: filter eligible devices
+backend --> backend: create JMS message
+backend -> broker: send JMS message
+activate broker
+backend --> fd: Send response
+deactivate fd
+
+deactivate backend
+
+broker --> backend: publish JMS message
+
+activate backend
+backend --> backend: convert to Push request
+backend -> pp: send Push request
+activate pp
+pp --> backend: Request failed
+deactivate pp
+backend --> backend: retry not sensible
+backend -> broker: send ack
+deactivate backend
+deactivate broker
+
+@enduml

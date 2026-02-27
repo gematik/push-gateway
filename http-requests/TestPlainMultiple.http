@@ -1,0 +1,718 @@
+### 200 - Two notifications one device
+
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "batch_item_1",
+      "notification": {
+        "event_id": "event_id_1",
+        "room_id": "room_id_1",
+        "type": "m.room.message",
+        "sender": "sender_1",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "batch_item_2",
+      "notification": {
+        "event_id": "event_id_2",
+        "room_id": "room_id_2",
+        "type": "m.room.message",
+        "sender": "sender_2",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 2,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 200 - Two notifications two devices
+
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "batch_item_1",
+      "notification": {
+        "event_id": "event_id_1",
+        "room_id": "room_id_1",
+        "type": "m.room.message",
+        "sender": "sender_1",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "batch_item_2",
+      "notification": {
+        "event_id": "event_id_2",
+        "room_id": "room_id_2",
+        "type": "m.room.message",
+        "sender": "sender_2",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 2,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "batch_item_3",
+      "notification": {
+        "event_id": "event_id_3",
+        "room_id": "room_id_3",
+        "type": "m.room.message",
+        "sender": "sender_3",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.two.appId}}",
+            "pushkey": "{{apns.pushClients.two.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "batch_item_4",
+      "notification": {
+        "event_id": "event_id_4",
+        "room_id": "room_id_4",
+        "type": "m.room.message",
+        "sender": "sender_4",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 2,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.two.appId}}",
+            "pushkey": "{{apns.pushClients.two.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 400 - Invalid data format (no id in the first notification)
+
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "notification": {
+        "event_id": "event_id_1",
+        "room_id": "room_id_1",
+        "type": "m.room.message",
+        "sender": "sender_1",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "batch_item_2",
+      "notification": {
+        "event_id": "event_id_2",
+        "room_id": "room_id_2",
+        "type": "m.room.message",
+        "sender": "sender_2",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 2,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 400", function() {
+        client.assert(response.status === 400, "Expected 400");
+    });
+%}
+
+### 200 - Batch size exceeds maximum limit (100 notifications) (1 below threshold)
+
+< {%
+    const notifications = [];
+
+    for (let i = 1; i <= 99; i++) {
+        notifications.push({
+            id: `batch_item_${i}`,
+            notification: {
+                event_id: `event_id_${i}`,
+                room_id: `room_id_${i}`,
+                type: "m.room.messages",
+                sender: `sender_${i}`,
+                sender_display_name: "Sender Display Name",
+                room_name: "Room Name",
+                prio: i % 2 === 0 ? "high" : "low",
+                content: {
+                    content: "Message content"
+                },
+                counts: {
+                    unread: 1,
+                    missed_calls: 0
+                },
+                devices: [
+                    {
+                        app_id: "de.gematik.push-poc-ios.apns",
+                        pushkey: "80c3b239e93b3cd35c5cb311f3597291d70c18e0d0539083b150440ad05bf4d7df3c2169060a12e2e1fcb051bc551d3f3698de1aa1cc079ff3788cf6b847d21a5347f2bf38919ce3b067cec92be53f75",
+                        pushkey_ts: 1634025600,
+                        data: {
+                            format: "format"
+                        },
+                        tweaks: {
+                            tweak: "tweak"
+                        }
+                    }
+                ]
+            }
+        });
+    }
+
+    request.variables.set("notifications", [notifications])
+%}
+
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": {{ notifications }}
+}
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 200 - Batch size exceeds maximum limit (100 notifications) (exact threshold)
+
+< {%
+    const notifications = [];
+
+    for (let i = 1; i <= 100; i++) {
+        notifications.push({
+            id: `batch_item_${i}`,
+            notification: {
+                event_id: `event_id_${i}`,
+                room_id: `room_id_${i}`,
+                type: "m.room.messages",
+                sender: `sender_${i}`,
+                sender_display_name: "Sender Display Name",
+                room_name: "Room Name",
+                prio: i % 2 === 0 ? "high" : "low",
+                content: {
+                    content: "Message content"
+                },
+                counts: {
+                    unread: 1,
+                    missed_calls: 0
+                },
+                devices: [
+                    {
+                        app_id: "de.gematik.push-poc-ios.apns",
+                        pushkey: "80c3b239e93b3cd35c5cb311f3597291d70c18e0d0539083b150440ad05bf4d7df3c2169060a12e2e1fcb051bc551d3f3698de1aa1cc079ff3788cf6b847d21a5347f2bf38919ce3b067cec92be53f75",
+                        pushkey_ts: 1634025600,
+                        data: {
+                            format: "format"
+                        },
+                        tweaks: {
+                            tweak: "tweak"
+                        }
+                    }
+                ]
+            }
+        });
+    }
+
+    request.variables.set("notifications", [notifications])
+%}
+
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": {{ notifications }}
+}
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 400 - Batch size exceeds maximum limit (100 notifications) (1 above threshold)
+
+< {%
+    const notifications = [];
+
+    for (let i = 1; i <= 101; i++) {
+        notifications.push({
+            id: `batch_item_${i}`,
+            notification: {
+                event_id: `event_id_${i}`,
+                room_id: `room_id_${i}`,
+                type: "m.room.messages",
+                sender: `sender_${i}`,
+                sender_display_name: "Sender Display Name",
+                room_name: "Room Name",
+                prio: i % 2 === 0 ? "high" : "low",
+                content: {
+                    content: "Message content"
+                },
+                counts: {
+                    unread: 1,
+                    missed_calls: 0
+                },
+                devices: [
+                    {
+                        app_id: "de.gematik.push-poc-ios.apns",
+                        pushkey: "80c3b239e93b3cd35c5cb311f3597291d70c18e0d0539083b150440ad05bf4d7df3c2169060a12e2e1fcb051bc551d3f3698de1aa1cc079ff3788cf6b847d21a5347f2bf38919ce3b067cec92be53f75",
+                        pushkey_ts: 1634025600,
+                        data: {
+                            format: "format"
+                        },
+                        tweaks: {
+                            tweak: "tweak"
+                        }
+                    }
+                ]
+            }
+        });
+    }
+
+    request.variables.set("notifications", [notifications])
+%}
+
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": {{ notifications }}
+}
+
+### 400 - Duplicate notification IDs in batch
+
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "batch_item_1",
+      "notification": {
+        "event_id": "event_id_1",
+        "room_id": "room_id_1",
+        "type": "m.room.message",
+        "sender": "sender_1",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "batch_item_1",
+      "notification": {
+        "event_id": "event_id_2",
+        "room_id": "room_id_2",
+        "type": "m.room.message",
+        "sender": "sender_2",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 2,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 400", function() {
+        client.assert(response.status === 400, "Expected 400");
+    });
+%}
+
+### 200 - Individual notification (64 kB) (1 B below threshold) (1404 Bytes !!!)
+
+< {%
+    const individualNotification = "A".repeat(1403);
+
+    request.variables.set("individualNotification", [individualNotification])
+%}
+
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "batch_item_1",
+      "notification": {
+        "event_id": "event_id_1",
+        "room_id": "room_id_1",
+        "type": "m.room.message",
+        "sender": "sender_1",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "{{ individualNotification }}"
+        },
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 200 - Individual notification (64 kB) (exact threshold)
+
+< {%
+    const individualNotification = "A".repeat(1404);
+
+    request.variables.set("individualNotification", [individualNotification])
+%}
+
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "batch_item_1",
+      "notification": {
+        "event_id": "event_id_1",
+        "room_id": "room_id_1",
+        "type": "m.room.message",
+        "sender": "sender_1",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "{{ individualNotification }}"
+        },
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 400 - Individual notification (64 kB) (1 B above threshold)
+
+< {%
+    const individualNotification = "A".repeat(1405);
+
+    request.variables.set("individualNotification", [individualNotification])
+%}
+
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "batch_item_1",
+      "notification": {
+        "event_id": "event_id_1",
+        "room_id": "room_id_1",
+        "type": "m.room.message",
+        "sender": "sender_1",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "{{ individualNotification }}"
+        },
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 400", function() {
+        client.assert(response.status === 400, "Expected 400");
+    });
+%}
+
+### 413 - Payload exceeds maximum allowed size modify ids, 64 kB or 256kB ...

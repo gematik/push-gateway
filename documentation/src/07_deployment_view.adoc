@@ -1,0 +1,21 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-deployment-view]]
+== Verteilungssichten
+Die Abbilung <<verteilungssicht_devops>> zeigt die Verteilung der Komponenten im Kontext der DevOps-Infrastruktur.
+
+[[verteilungssicht_devops]]
+[plantuml,verteilungssicht_devops,svg,align="center",scale=95]
+.Verteilungssicht DevOps
+....
+include::../uml/deployment-view-cicd.puml[]
+....
+
+Die Abbildung <<verteilungssicht_stage>> zeigt die Verteilung der Komponenten im Kontext einer verwendeten Stage (EU, RU, PU).
+
+[[verteilungssicht_stage]]
+[plantuml,verteilungssicht_stage,svg,align="center",scale=95]
+.Verteilungssicht Stage
+....
+include::../uml/deployment-view-stage.puml[]
+....

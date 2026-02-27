@@ -1,0 +1,230 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "push-gateway.fullname" . }}-consumer
+  labels:
+    {{ include "push-gateway.consumer.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{ include "push-gateway.consumer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{ include "push-gateway.consumer.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "push-gateway.serviceAccountName" . }}
+      initContainers:
+        - name: wait-for-dependencies
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "busybox:1.37.0"
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 128M
+              cpu: 1000m
+            requests:
+              memory: 128M
+              cpu: 200m
+          command:
+            - sh
+            - -c
+          {{ if .Values.gcpSqlProxy }}
+            - |
+              echo "Waiting for JMS broker to be ready..."
+              while ! nc -z {{ include "push-gateway.fullname" . }}-broker {{ .Values.jms.broker.port }}; do
+                echo "Broker not yet ready, retrying..."
+                sleep 2
+              done
+              echo "Broker ready" 
+          {{ else }}
+            - |
+              echo "Waiting for PostgreSQL to be ready..."
+              while ! nc -z {{ include "push-gateway.fullname" . }}-postgres 5432; do
+                echo "PostgreSQL not yet ready, retrying..."
+                sleep 2
+              done
+              echo "PostgreSQL ready"
+
+              echo "Waiting for JMS broker to be ready..."
+              while ! nc -z {{ include "push-gateway.fullname" . }}-broker {{ .Values.jms.broker.port }}; do
+                echo "Broker not yet ready, retrying..."
+                sleep 2
+              done
+              echo "Broker ready"
+          {{ end }}
+      containers:
+        - name: {{ .Chart.Name }}-consumer
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          env:
+            - name: "APP_MODE"
+              value: "CONSUMER"
+            {{ if .Values.backend.config.debug }}
+            - name: "JAVA_TOOL_OPTIONS"
+              value: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+            - name: "LOG_LEVEL"
+              value: "DEBUG"
+            {{ else }}
+            - name: "LOG_LEVEL"
+              value: "INFO"
+            {{ end }}
+            - name: "OTEL_LOGS_EXPORTER"
+              value: "none"
+{{ if .Values.backend.config.metrics.enabled }}
+            - name: "OTEL_METRICS_EXPORTER"
+              value: "otlp"
+            - name: "MANAGEMENT_OTLP_METRICS_EXPORT_ENABLED"
+              value: "true"
+            - name: "MANAGEMENT_OTLP_METRICS_EXPORT_URL"
+              value: "{{ .Values.backend.config.metrics.otlp.endpoint }}"
+            - name: "MANAGEMENT_OTLP_METRICS_EXPORT_STEP"
+              value: "{{ .Values.backend.config.metrics.otlp.step }}"
+            - name: "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"
+              value: "{{ .Values.backend.config.metrics.otlp.endpoint }}"
+            - name: "OTEL_EXPORTER_OTLP_METRICS_PROTOCOL"
+              value: "{{ default "grpc" .Values.backend.config.metrics.otlp.protocol }}"
+{{ else }}
+            - name: "OTEL_METRICS_EXPORTER"
+              value: "none"
+{{ end }}
+            {{ if or .Values.backend.config.tracing.enabled .Values.backend.config.metrics.enabled }}
+            - name: "OTEL_JAVA_GLOBAL_AUTOCONFIGURE_ENABLED"
+              value: "true"
+            {{ end }}
+            {{ if .Values.backend.config.tracing.enabled }}
+            - name: "OTEL_TRACES_EXPORTER"
+              value: "otlp"
+            - name: "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"
+              value: "{{ .Values.backend.config.tracing.jaeger.endpoint }}"
+            - name: "OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"
+              value: "{{ default "grpc" .Values.backend.config.tracing.jaeger.protocol }}"
+            {{ else }}
+            - name: "OTEL_TRACES_EXPORTER"
+              value: "none"
+            {{ end }}
+            {{ if or .Values.backend.config.tracing.enabled .Values.backend.config.metrics.enabled }}
+            - name: "OTEL_RESOURCE_ATTRIBUTES"
+              value: "deployment.environment={{ .Values.stage }}"
+            - name: "OTEL_SERVICE_NAME"
+              value: "erezeptapp-pushgw-consumer"
+            - name: "MANAGEMENT_OBSERVATIONS_ANNOTATIONS_ENABLED"
+              value: "true"
+            {{ end }}
+            - name: "MANAGEMENT_SERVER_PORT"
+              value: "8083"
+            - name: "JMS_BROKER_USERNAME"
+              valueFrom:
+                secretKeyRef:
+                  name: "broker-credentials"
+                  key: "username"
+            - name: "JMS_BROKER_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "broker-credentials"
+                  key: "password"
+            - name: "JMS_BROKER_URL"
+              value: "tcp://{{ include "push-gateway.fullname" . }}-broker:{{ .Values.jms.broker.port }}"
+            - name: "PUSH_CONFIG_FILE"
+              value: "file:/app/config/push_config.yaml"
+            - name: "POSTGRES_URL"
+              value: {{ .Values.postgres.jdbc }}
+            - name: "POSTGRES_USERNAME"
+              valueFrom:
+                secretKeyRef:
+                  name: "pushgw"
+                  key: "username"
+            - name: "POSTGRES_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "pushgw"
+                  key: "password"
+          volumeMounts:
+            - name: "push-config-yaml-volume"
+              mountPath: "/app/config/push_config.yaml"
+              subPath: "push_config.yaml"
+            - name: "apns-pkcs8-volume"
+              mountPath: "/app/config/apns/keys"
+            - name: "apns-pkcs12-volume"
+              mountPath: "/app/config/apns/certs"
+            - name: "firebase-service-account-json-volume"
+              mountPath: "/app/config/firebase"
+            - name: "tmp"
+              mountPath: "/tmp"
+          ports:
+            - name: api
+              containerPort: 8082
+              protocol: TCP
+            - name: management
+              containerPort: 8083
+              protocol: TCP
+            {{ if .Values.backend.config.debug }}
+            - name: debug
+              containerPort: 5005
+              protocol: TCP
+            {{ end }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: management
+            initialDelaySeconds: 60
+            periodSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: management
+            initialDelaySeconds: 60
+            periodSeconds: 5
+            failureThreshold: 3
+          resources:
+            {{ toYaml .Values.consumer.resources | nindent 12 }}
+        {{- if .Values.gcpSqlProxy }}
+        - name: {{ .Chart.Name }}-sql-proxy
+          image: {{ .Values.gcpSqlProxy.imageName }}:{{ .Values.gcpSqlProxy.imageTag }}
+          imagePullPolicy: {{ .Values.gcpSqlProxy.pullPolicy | quote }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          env:
+            - name: CSQL_PROXY_PORT
+              value: {{ .Values.gcpSqlProxy.port | quote }}
+            - name: CSQL_PROXY_PRIVATE_IP
+              value: "true"
+            - name: CSQL_PROXY_INSTANCE_CONNECTION_NAME
+              value: {{ .Values.cloudProxy.db_connection_name | quote }}
+          resources:
+            {{- toYaml .Values.resourcesProxy | nindent 12 }}
+        {{- end }}
+
+      volumes:
+        - name: "push-config-yaml-volume"
+          configMap:
+            name: {{ include "push-gateway.fullname" . }}-push-config
+        - name: "apns-pkcs8-volume"
+          secret:
+            secretName: "apns-pkcs8-keys"
+            optional: true
+        - name: "apns-pkcs12-volume"
+          secret:
+            secretName: "apns-pkcs12-certs"
+            optional: true
+        - name: "firebase-service-account-json-volume"
+          secret:
+            secretName: "firebase-service-account-jsons"
+            optional: true
+        - name: "tmp"
+          emptyDir: { }

@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "de-gematik-gatling",
+  "private_key_id": "abcdef",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDIUr6lDh2ZOR/9\nW059gpt3sA8ld4oNfEk3V6Znah0vniurRYUdpZJQoj5Py+8EEP6PIiZhdMl45kRD\nj1J6ncOlcpXt3MmK2LimRJ+Z7Dk/kC0OLPCJrmKFLKGVm9wFRFfDboysslhkvUA3\nA2f7hwdcps4lrzMiJ2KN0myoTl/GriqfGvjO0Qh13zpOYAwdFeTOZ4FeCccNrc72\ny5kF/fy24zANcMPpJQAKs/vTY4OBTKEAFEZciyQmcF8r8kY9b2jUs4SweFbYaAWA\nUYzKYiATqNKFlVS4Z3vTqm/HP0/Jyo4sbtGkfNdcH7fsrU2YwmcbcEOCQr9FERz5\nSqCRv/9nAgMBAAECggEAWwn/ylNX8EKd3y6XxUKOFR7WQ1jITMinHZef8G+xQ+rG\nPdgiXw7YJ/0UBH/R6C8xASur9a51wZQkge+otEDuoUoqCSfGEGvdvvKA9hr9CX4k\ne8TArFGsRIm8BZoHq/0bRZ4AIJwMv/uiK15I6266Uckc9tNgka0EhR+UcgjsTgYa\nUvPPtE+TtjQd/HHge/5RBVeeg2b68YaYYXlnm3x13AlokEba2s/i2M012rqFC9Q5\naZYEpENb3iAO4YuhzmFigaTBj+Q46VImRP8qGF3IZ7GiTyLnO/mH4+OX+LY+zYcy\nIADw+mQicBS+UMloBvUhQZEpL8uAauE0VFG9dJaQQQKBgQD55//aWVmw8N0l/PiI\nnzAsvWhqIjWVU0wRfmHHHLYt6PL4025f8jdzv86bsMypadyiC6lLlj1mD8PKEtWI\n6n92zFJEPOk4D2i/71oqOH97Tr3WnI3/dQiiZrIzUU56yFyevjzJhutnVbXWJNNl\nFoH+TVOeKW/aWYbjiiGhsvIqDQKBgQDNNTsjnWxFYrKOBX4YCRTYsl/xY4alLLgo\nQbt/57uXTzd7bHxHNTPXt+IEi4Q4K/x/+HrPXckrM2IAa+E7WNLIZ+Vz+5a+8881\n9vZK63uhw/AOICF5/diGPwHCyL7HFVGbwRiDPTksvWVJ6D2JehfoKcAjPdQy6Om9\nwMwDsrF2QwKBgBuQ0LMIGhGfb/Vpwwxm6sx0lBjo7xoqlwBy/VwWOa40vOBfihRB\nRoaZCLQ5u0mQqMqjGKiCyQECCim3DCDPJQI4pXZrdZo+cOKDB2IS21UBqYULvcoI\n4cvwIgXxGQQIJ9dGyrO8EylR1f3qD/tdkTc41lli3riqGWvt56nLcFTdAoGAPGTm\nOt0h+GnL0zCao8hIcl5NDmYUQpieunpeDI7PDwEpexG6odpun5Zm1p+ZEk8fySoA\nOveHNUeyGB2n9Cd4IbMyPKhW/WwUF/XPFs2nXTylcgLS12x2RUxV4FXkkAMeOZDi\n/f0OzrQPE2lecw+T6agf/D8+LJ2P7WDIqm30/LECgYEAjTsjU/vbQUEUs9CWH2Py\nW2TKuw+PFpL+QOhnJWr6QGTETXQ3WsMcu7YAodHfOFuMT01Pr5CinT/XG44RkFw3\nyQNe3PWd3Re7vPwNHS5gqBGYcjQtIRHVqAjNgn2vFNZyIaA/fCifa/aQ82r76JKG\n0ceqgwwGxY+v2pwDovNvHwE=\n-----END PRIVATE KEY-----",
+  "client_email": "firebase-adminsdk-fbsvc@de-gematik-gatling.iam.gserviceaccount.com",
+  "client_id": "abcdef",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40com-mtsoft-android.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

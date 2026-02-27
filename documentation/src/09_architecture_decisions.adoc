@@ -1,0 +1,30 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-design-decisions]]
+== Architekturentscheidungen
+
+[cols="1,2,1,3,3,3,3,3,1", options="header"]
+|===
+| ADR-ID | Titel | Status | Kontext | Entscheidung | Begründung | Konsequenzen | Alternativen | Datum
+
+| ADR-002[[adr002]]
+| Technologieauswahl Persistenz
+| Entschieden
+| Aufzeichnung abgelehnter Pushkeys
+| PostgreSQL
+| Einfache betriebsseitige Umsetzbarkeit
+| Relationales DB-System obwohl es keine Relationen gibt
+| NoSQL DB-System (MongoDB)
+| 12/2025
+
+| ADR-001[[adr001]]
+| Technologieauswahl Pufferung
+| Entschieden
+| Pufferung und Retry-Mechanismen
+| JMS (Artemis Broker)
+| Erfüllt alle Anforderungen durch Konfiguration
+| Erzeugt Integrationsaufwand, vermeidet Implementierungsaufwand
+| Google's JMS-Äquivalent
+| 11/2025
+
+|===

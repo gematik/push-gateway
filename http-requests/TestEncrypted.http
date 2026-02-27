@@ -1,0 +1,607 @@
+### 200 - Two notifications one device
+
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "enc_batch_1",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_one}}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    },
+    {
+      "id": "enc_batch_2",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_two}}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "low",
+        "counts": {
+          "unread": 2,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 200 - Two notifications two devices
+
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "enc_batch_1",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_one}}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    },
+    {
+      "id": "enc_batch_2",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_two}}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "low",
+        "counts": {
+          "unread": 2,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    },
+    {
+      "id": "enc_batch_3",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_one}}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.two.appId}}",
+          "pushkey": "{{apns.pushClients.two.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    },
+    {
+      "id": "enc_batch_4",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_two}}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "low",
+        "counts": {
+          "unread": 2,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.two.appId}}",
+          "pushkey": "{{apns.pushClients.two.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 400 - Invalid data format (missing cyphertext)
+
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "enc_batch_1",
+      "notification": {
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    },
+    {
+      "id": "enc_batch_2",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_two}}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "low",
+        "counts": {
+          "unread": 2,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 400", function() {
+        client.assert(response.status === 400, "Expected 400");
+    });
+%}
+
+### 200 - Batch size exceeds maximum limit (100 notifications) (1 below threshold)
+
+< {%
+    const notifications = [];
+
+    for (let i = 1; i <= 99; i++) {
+        notifications.push({
+            id: `enc_batch_${i}`,
+            notification: {
+                ciphertext: "{{examples.ciphertext_one}}",
+                time_message_encrypted: "2023-10",
+                key_identifier: "123e4567-e89b-12d3-a456-426614174000",
+                prio: i % 2 === 0 ? "high" : "low",
+                counts: {
+                    unread: 2,
+                    missed_calls: 0
+                },
+                device: {
+                    app_id: "de.gematik.push-poc-ios.apns",
+                    pushkey: "80c3b239e93b3cd35c5cb311f3597291d70c18e0d0539083b150440ad05bf4d7df3c2169060a12e2e1fcb051bc551d3f3698de1aa1cc079ff3788cf6b847d21a5347f2bf38919ce3b067cec92be53f75",
+                    pushkey_ts: 1634025600,
+                    data: {
+                        format: "format"
+                    },
+                    tweaks: {
+                        tweak: "tweak"
+                    }
+                }
+            }
+        });
+    }
+
+    request.variables.set("notifications", [notifications])
+%}
+
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": {{ notifications }}
+}
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 200 - Batch size exceeds maximum limit (100 notifications) (exact threshold)
+
+< {%
+    const notifications = [];
+
+    for (let i = 1; i <= 100; i++) {
+        notifications.push({
+            id: `enc_batch_${i}`,
+            notification: {
+                ciphertext: "{{examples.ciphertext_one}}",
+                time_message_encrypted: "2023-10",
+                key_identifier: "123e4567-e89b-12d3-a456-426614174000",
+                prio: i % 2 === 0 ? "high" : "low",
+                counts: {
+                    unread: 2,
+                    missed_calls: 0
+                },
+                device: {
+                    app_id: "de.gematik.push-poc-ios.apns",
+                    pushkey: "80c3b239e93b3cd35c5cb311f3597291d70c18e0d0539083b150440ad05bf4d7df3c2169060a12e2e1fcb051bc551d3f3698de1aa1cc079ff3788cf6b847d21a5347f2bf38919ce3b067cec92be53f75",
+                    pushkey_ts: 1634025600,
+                    data: {
+                        format: "format"
+                    },
+                    tweaks: {
+                        tweak: "tweak"
+                    }
+                }
+            }
+        });
+    }
+
+    request.variables.set("notifications", [notifications])
+%}
+
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": {{ notifications }}
+}
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 400 - Batch size exceeds maximum limit (100 notifications) (1 above threshold)
+
+< {%
+    const notifications = [];
+
+    for (let i = 1; i <= 101; i++) {
+        notifications.push({
+            id: `enc_batch_${i}`,
+            notification: {
+                ciphertext: "{{examples.ciphertext_one}}",
+                time_message_encrypted: "2023-10",
+                key_identifier: "123e4567-e89b-12d3-a456-426614174000",
+                prio: i % 2 === 0 ? "high" : "low",
+                counts: {
+                    unread: 2,
+                    missed_calls: 0
+                },
+                device: {
+                    app_id: "de.gematik.push-poc-ios.apns",
+                    pushkey: "80c3b239e93b3cd35c5cb311f3597291d70c18e0d0539083b150440ad05bf4d7df3c2169060a12e2e1fcb051bc551d3f3698de1aa1cc079ff3788cf6b847d21a5347f2bf38919ce3b067cec92be53f75",
+                    pushkey_ts: 1634025600,
+                    data: {
+                        format: "format"
+                    },
+                    tweaks: {
+                        tweak: "tweak"
+                    }
+                }
+            }
+        });
+    }
+
+    request.variables.set("notifications", [notifications])
+%}
+
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": {{ notifications }}
+}
+
+> {%
+    client.test("Status is 400", function() {
+        client.assert(response.status === 400, "Expected 400");
+    });
+%}
+
+### 200 - Individual notification (1404 kB) (1 B below threshold) TODO
+
+< {%
+    const individualNotification = "A".repeat(65535);
+
+    request.variables.set("individualNotification", [individualNotification])
+%}
+
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "enc_batch_1",
+      "notification": {
+        "ciphertext": "{{ individualNotification }}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    }
+  ]
+}
+
+
+> {%
+    client.test("Status is 200", function() {
+        client.assert(response.status === 200, "Expected 200");
+    });
+%}
+
+### 400 - Individual notification (64 kB) (exact threshold)
+
+< {%
+    const individualNotification = "A".repeat(65536);
+
+    request.variables.set("individualNotification", [individualNotification])
+%}
+
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "enc_batch_1",
+      "notification": {
+        "ciphertext": "{{ individualNotification }}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    }
+  ]
+}
+
+
+> {%
+    client.test("Status is 400", function() {
+        client.assert(response.status === 400, "Expected 400");
+    });
+%}
+
+### 400 - Individual notification (64 kB) (1 B above threshold)
+
+< {%
+    const individualNotification = "A".repeat(65537);
+
+    request.variables.set("individualNotification", [individualNotification])
+%}
+
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "enc_batch_1",
+      "notification": {
+        "ciphertext": "{{ individualNotification }}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    }
+  ]
+}
+
+
+> {%
+    client.test("Status is 400", function() {
+        client.assert(response.status === 400, "Expected 400");
+    });
+%}
+
+### 400 - Duplicate notification IDs in batch
+
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "enc_batch_1",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_one}}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    },
+    {
+      "id": "enc_batch_1",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_two}}",
+        "time_message_encrypted": "2023-10",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "low",
+        "counts": {
+          "unread": 2,
+          "missed_calls": 0
+        },
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}",
+          "pushkey_ts": 1634025600,
+          "data": {
+            "format": "format"
+          },
+          "tweaks": {
+            "tweak": "tweak"
+          }
+        }
+      }
+    }
+  ]
+}
+
+> {%
+    client.test("Status is 400", function() {
+        client.assert(response.status === 400, "Expected 400");
+    });
+%}
+
+### 413 - Payload exceeds maximum allowed size
+
+    ### TODO: header + payload must exceed maximum size
+
+    ### TODO 1B below threshold (200)
+
+    ### TODO exact threshold (200 or 413)
+
+    ### TODO 1B above threshold (413)

@@ -1,0 +1,25 @@
+{{ $fullName := include "push-gateway.fullname" . }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-broker
+  labels:
+    {{- include "push-gateway.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8161
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 5672
+      targetPort: amqp
+      protocol: TCP
+      name: amqp
+    - port: 61616
+      targetPort: service
+      protocol: TCP
+      name: service
+  selector:
+    {{- include "push-gateway.selectorLabels" . | nindent 4 }}

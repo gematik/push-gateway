@@ -1,0 +1,34 @@
+@startuml
+
+actor Entwickler as dev
+
+node "Developers Machine <<Computer>>" as dev_ws
+
+rectangle DevOps {
+
+    port "Stages" as stages
+
+    node "gematik Worker" <<Worker>> as nod_devops {
+        node "Gitlab" <<Server>> as node_devops_gitlab {
+            collections "Repositories" <<Git>> as git_repos
+        }
+
+        node "Jenkins" <<Server>> as node_jenkins {
+            collections "Jobs" <<Pipeline>> as pipelines
+        }
+
+        node "Docker Registry" <<Registry>> as node_devops_docker_registry {
+            collections "Docker-Images" <<Artefakt>> as docker_artifacts
+        }
+
+        dev -r-> dev_ws : uses
+        dev_ws <-u-> git_repos : push/pull [https|ssh]
+        git_repos -r-> pipelines : code change triggers [https]
+
+        pipelines -r-> docker_artifacts : push image [https]
+    }
+
+    stages --> docker_artifacts : pull images [https]
+}
+
+@enduml
