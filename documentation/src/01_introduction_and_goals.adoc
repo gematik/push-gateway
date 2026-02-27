@@ -1,0 +1,10 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-introduction-and-goals]]
+==	Einführung
+Die gematik entwickelt im Auftrag des Bundesgesundheitsminiteriums die mobile Applikation „eRezept“. Auf den Plattformen iOS und Android bietet diese App Services rund um das eRezept an. Um den Benutzern besseren Komfort bieten zu können, sollen die Applikationen um Push Notifications erweitert werden.
+
+=== Aufgabenstellung
+Das auslösende System von Notifications ist im ersten Schritt der eRezept-Fachdienst innerhalb der geschützten TI (Telematikinfrastruktur). Weitere Ausbaustufen können der ePA-Fachdienst oder die Messenger TIM bzw. KIM sein.
+
+Das Gesamtsystem und die Aufgaben des Push-Gateways sind in <<spec,gemF_PushNotification_V1.0.0>> beschrieben, insbesondere in Kapitel 5.2. Zusätzlich liegt das <<concept, Push-Notification-Konzept der gematik>> zu Grunde. Diese konkreten Anforderungen sind bei der Leistungserbringung zu berücksichtigen.

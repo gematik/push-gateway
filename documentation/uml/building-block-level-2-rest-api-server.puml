@@ -1,0 +1,19 @@
+@startuml
+
+component "REST-Api-Server"" <<System>> as api {
+
+    component "Validation" <<Subsystem>> as validation
+    component "Filtering" <<Subsystem>> as filtering
+    component "JMS-Producer" <<Subsystem>> as producer
+
+    port "REST" as portRest
+    port "Broker" as portBroker
+
+    ' connections
+    portRest ..> validation
+    validation .right.> filtering
+    filtering .right.> producer
+    producer ..> portBroker
+}
+
+@enduml

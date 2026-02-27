@@ -1,0 +1,35 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-concepts]]
+== Querschnittliche Konzepte
+
+=== Funktionale Fehlerbehandlung
+Es werden im Wesentlichen zwei Fehlerarten unterschieden, fachliche Fehler und nicht fachliche Fehler. Da fachliche Fehler fachlich begründet sind, sind sie gleichermaßen erwartbar und somit bereits zur Compilezeit bekannt, mit allen Garantien, die der Compiler zusichert. Als solche sind sie im Grunde Teil des fachlichen Modells. Anders als Exceptions unterbrechen sie, richtig angewendet, nicht den Programmfluss und sind daher frei von daraus resultierenden Seiteneffekten. Das macht den Code leichter wart- und testbar.
+
+Die Implementierung des Push-Gateways macht starken Gebrauch von diesem Pattern und verwendet dabei die Bibliothek <<lib_arrow,arrow>>. Eine detaillierte Erklärung der funktionalen Fehlerbehandlung mit _Either_ ist in <<functional_error_handling,diesem Artikel>> zu finden.
+
+=== Fire and Forget
+Die Entgegennahme von Push-Notification-Requests und deren eigentliche Verarbeitung sind technisch entkoppelt. Damit werden u. A. kurze Antwortzeiten für die Fachdienste erreicht. Dafür wird akzeptiert, dass eine 2xx-er-Antwort des REST-Api-Servers nicht zwingend bedeutet, dass eine Push-Notification tatsächlich auf dem Zielgerät angekommen ist. Die Zustellung hängt von Gegebenheiten ab, die sich außerhalb der Kontrolle des Push-Gateways befinden, wodurch ein Warten auf beteiligte Fremdsysteme zu langläufigen Requests führen kann, was die Erfüllung von <<EFZV01>> gefährdet.
+
+=== Konfiguration
+
+==== Modi
+Das Backend kann zum Zwecke der leichteren Skalierbarkeit in unterschiedlichen Modi betrieben werden:
+
+[cols="1,2", options="header"]
+|===
+| Modus | Erklärung
+
+| PRODUCER
+| In diesem Modus stellt die Anwendung die REST-Schnittstelle zur Verfügung und fungiert als Produzent von JMS-Nachrichten für den Broker.
+
+| CONSUMER
+| In diesem Modus agiert die Anwendung lediglich als Konsument der aufgelaufenen JMS-Nachrichten beim Broker. Sie hört auf die Queues und arbeiten eintreffende JMS-Nachrichten geordnet ab.
+
+| BOTH
+| In diesem Modus übernimmt die Anwendung sowohl PRODUCER- als auch CONSUMER-Aufgaben. Dieser Modus ist insbesondere zum Testen auf der lokalen Maschine gedacht und soll die Weiterentwicklung vereinfachen.
+
+|===
+
+==== Push-Konfiguration
+Der Anwendung liegt eine komplexe Push-Konfiguration in Dateiform zugrunde. Diese bestimmt insbesondere wie Fachdienste Ziel-Apps beschreiben müssen und welche Push-Provider bedient werden können.

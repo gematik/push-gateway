@@ -1,0 +1,36 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-context-and-scope]]
+== Kontextabgrenzung
+
+Das Push-Gateway abstrahiert verschiedene Push-Service-Anbieter wie z. B. Apple Push Notification Service (APNS) und Firebase. Es ist im Wesentlichen getrieben durch Anforderungen, sogenannte AFOs, die von der gematik spezifiziert und veröffentlicht werden. Dem Push-Gateway liegen in diesem Kontext insbesondere die AFOs aus der gematik-Spezifikation <<spec, gemF_PushNotification_V1.1.0>> zugrunde.
+
+Diese werden dort in Kapitel 5.2 beschrieben und lauten im Einzelnen:
+
+* <<A_27164>> - Push Gateway - OpenApi_Notification_PushGateway
+* <<A_27165-01>> - Push Gateway - Push Notification senden – Aufruf Push Provider
+* <<A_27512>> - Push Gateway - Direkte Kommunikation mit Push Provider
+* <<A_27539>> - Push Gateway - Keine Verarbeitung unverschlüsselter personenbezogener Daten
+* <<A_27611>> - Push Gateway - Keine Rückschlüsse auf genutzte Anwendungen
+* <<A_27435>> - Push Gateway – Unverzügliches Löschen von Push Notification
+* <<A_27757>> - Push Gateway – Maximal-Frist für Push Notifications im Push Gateway
+* <<A_27167>> - Push Gateway - Prio Feld mappen
+
+=== Fachlicher Kontext
+Das Push-Gateway agiert als Mittelsmann zwischen Fachdiensten und Push-Providern. Es abstrahiert die Schnittstellen der unterstützten Push-Provider und bietet eine einheitliche Schnittstelle für Fachdienste an, damit diese nicht jeweils separat die Schnittstellen der Push-Provider anbinden müssen.
+
+=== Technischer Kontext
+Das <<kontextdiagramm, Kontextdiagramm>> zeigt die beteiligten Systeme. Deren Interaktion wird über die verbindenden Linien dargestellt.
+
+[[kontextdiagramm]]
+[plantuml,kontextdiagramm,svg,align="center",scale=95]
+.Kontextdiagramm
+....
+include::../uml/technical-context.puml[]
+....
+
+==== REST-Api
+Das Push-Gateway implementiert die <<openapi, OpenAPI>> in der Version 1.0.0, die von der gematik gepflegt wird.
+
+==== Push-Api
+Jeder Push-Provider bietet eigene technische Möglichkeiten mit ihm zu kommunizieren. In diesem Projekt werden Client-Bibliotheken verwendet, die die technischen Details der Kommunikation umsetzen. Im Fall von Firebase ist dies die Bibliothek _com.google.firebase:firebase-admin_, im Fall von APNS ist dies die Bibliothek _com.eatthepath:pushy_. Daher ist hier die Schnittstelle der Push-Provider vereinfacht dargestellt.

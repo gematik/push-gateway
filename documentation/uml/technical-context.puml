@@ -1,0 +1,50 @@
+@startuml
+
+<style>
+.Push-Provider {
+    BackgroundColor black
+    FontColor white
+    LineColor white
+}
+
+.Fachdienst, .Client {
+    BackgroundColor orange
+}
+
+.System {
+    BackgroundColor lightgreen
+}
+
+folder {
+    BackgroundColor aliceblue
+}
+</style>
+
+' Komponenten
+component "z. B. eRezept" <<Fachdienst>> as fachdienst
+component "z. B. eRezept-App" <<Client>> as app
+
+folder "Push-Gateway" {
+    component "Push-Gateway" <<System>> as pgw
+    interface "Api" as pgw_if
+
+}
+
+component "APNS, Firebase" <<Push-Provider>> as pp
+interface "Push-Api" as push_if
+
+' Connections
+fachdienst --( pgw_if
+pgw_if -right- pgw : REST/http
+pgw -right-( push_if
+push_if -right- pp
+pp ..> app
+
+
+legend left
+    <color:green>●</color> Push-Gateway
+    <color:orange>●</color> Drittsystem
+    <color:black>●</color> Fremdsystem, Blackbox
+endlegend
+
+@enduml

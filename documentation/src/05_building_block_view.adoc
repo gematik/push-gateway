@@ -1,0 +1,108 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-building-block-view]]
+== Bausteinsicht
+
+=== Whitebox Gesamtsystem
+
+[[bausteinsicht_level_1]]
+[plantuml,bausteinsicht_level_1,svg,align="center",scale=95]
+.Bausteinsicht - Ebene 1
+....
+include::../uml/building-block-level-1.puml[]
+....
+
+Begründung:: Der Eingang und die Validierung von eingehenden Push-Nachrichten wird von deren eigentlicher Verarbeitung entkoppelt. Damit folgt das System dem "Fire and forget-Ansatz". Zu diesem Zweck enthält das System Bausteine, die entsprechende Verantwortlichkeiten im Gesamtprozess übernehmen.
+
+Enthaltene Bausteine::
+[cols="1,5"]
+|===
+|Baustein | Verantwortlichkeit
+
+|REST-Api-Server
+|Dieses Subsystem ist der Zugangspunkt für Fachdienste, die Push-Notifications versenden wollen. Es implementiert die <<openapi,OpenAPI>> der gematik und evaluiert, ob eine Weiterleitung an einen Push-Provider sinnvoll ist oder nicht.
+
+|Message-Broker
+|Dieses Subsystem nimmt alle potentiell zustellbaren Push-Notification-Payloads entgegen und veröffentlicht sie in diversen JMS-Queues. Alles was hier ankommt, wird an einen Push-Provider ausgeliefert.
+
+|Message-Consumer
+|Dieses Subsystem hört auf die Queues des Message-Brokers und verarbeitet JMS-Nachrichten. Im Erfolgsfall wird so aus der JMS-Nachricht eine Push-Notification für eine bestimmte App auf einem bestimmten Gerät. Im Fehlerfall wird je nach Fehler zeitversetzt eine neue Übermittlung an den Push-Provider versucht, oder die Nachricht verworfen.
+|===
+
+Wichtige Schnittstellen:: Zu den wichtigen Schnittstellen gehören insbesondere die Zugangspunkte zu den Push-Providern, APNS und Firebase. Auf deren Verfügbarkeit oder Funktionalität kann sich das System nicht verlassen. Es muss deshalb geeignete Pufferungsmöglichkeiten umsetzen, um etwaigen Ausfällen der Push-Provider-Systeme robust zu begegnen.
+
+==== REST-Api-Server
+* Zugangspunkt für Fachdienste, die Push-Notifications versenden
+* Schnittstelle wird aus <<openeapi,OpenApi>>-Spec im Modul _spring-boot-server_ generiert und als Abhängigkeit im Modul _backend_ eingebunden
+* Verwendet eine Datenbank zur Speicherung abgelehnter Pushkeys
+* Responses haben nur bedingt Bezug zum vorangegangenen Request, insbesondere bzgl. abgelehnter Pushkeys
+
+==== Message-Broker
+* Enthält alle Push-Notification-Payloads, die formal korrekt sind und deren Pushkey-Status gültig ist
+* Bietet jeden Push-Notification-Payload zur Verarbeitung an, solange sie nicht erfolgreich beim Push-Provider abgeliefert wurden und <<A_27757>> nicht verletzt wird
+* Sorgt durch Konfiguration für die Umsetzung von <<A_27757>>
+
+==== Message-Consumer
+* Sorgt unter Berücksichtigung aller relevanten AFOs für die geordnete Verarbeitung aller Push-Notification-Payloads im Message-Broker, insbesondere die Konvertierung und Übermittlung an den jeweils zuständigen Push-Provider (APNS oder Firebase)
+
+==== APNS
+Die Schnittstelle wird verwendet, um Push-Notifications über APNS an iOS-Geräte zu versenden. Zu diesem Zweck kommt die Java-Bibliothek _com.eatthepath:pushy_ zum Einsatz.
+
+==== Firebase
+Die Scnittstelle wird verwendet, um Push-Notifications über Firebase an Android-Geräte zu versenden. Zu diesem Zweck kommt die Java-Bibliothek _com.google.firebase:firebase-admin_ zum Einsatz.
+
+=== Ebene 2
+[[bausteinsicht_level_2_restapiserver]]
+[plantuml,bausteinsicht_level_2_rest_api_server,svg,align="center",scale=95]
+.Bausteinsicht - Ebene 2
+....
+include::../uml/building-block-level-2-rest-api-server.puml[]
+....
+
+==== Whitebox REST-Api-Server
+Das REST-Api-Server Modul zerfällt in drei Submodule, Validation, Filtering und JMS-Producer.
+
+Enthaltene Bausteine::
+[cols="1,5"]
+|===
+|Baustein | Verantwortlichkeit
+
+|Validation
+|Dieses Subsystem validiert die empfangenen Requests auf formale Korrektheit. Diese Aufgabe übernimmt im Wesentlichen das Spring-Boot Framework.
+
+|Filtering
+|Dieses Subsystem ermittelt, ob eine Zustellung an einen Push-Provider sinnvoll ist. Dazu legt es insbesondere die Informationen hinsichtlich bereits zurückgewiesener Pushkeys zu Grunde. Enthält ein Request einen bereits zurückgewiesenen Pushkey, wird gar nicht erst versucht den Payload an den Push-Provider zu senden, weil dieser ohnehin abgelehnt würde. Außerdem wird mithilfe der Push-Konfiguration ermittelt, ob für den Payload ein konfigurierter Push-Client zuständig und verfügbar ist.
+
+|JMS-Producer
+|Dieses Subsystem erzeugt JMS-Nachrichten aus validen und relevanten Requests und sendet sie in entsprechende Queues an den Broker.
+|===
+
+==== Whitebox JMS-Broker
+Das JMS-Broker ist eine Blackbox (Apache Artemis) und enthält per Konfiguration vier Message-Queues, je zwei für APNS und Firebase (plain und enrypted). Die Payloads (plain und encrypted) und die Verarbeitung (APNS und Firebase) unterscheiden sich geringfügig, was die Aufteilung bedingt. Außerdem kann man so im Broker sehen, welches Format wie oft verwendet wird.
+
+[[bausteinsicht_level_2_broker]]
+[plantuml,bausteinsicht_level_2_broker,svg,align="center",scale=95]
+.Bausteinsicht - Ebene 2
+....
+include::../uml/building-block-level-2-jms-broker.puml[]
+....
+
+Enthaltene Bausteine::
+[cols="1,5"]
+|===
+|Baustein | Verantwortlichkeit
+
+|APNS Plain
+|Diese Queue enthält alle Payloads für APNS die nicht verschlüsselt sind (plain) sind.
+
+|APNS Encrypted
+|Diese Queue enthält alle Payloads für APNS die verschlüsselt sind (encrypted) sind.
+
+|Firebase Plain
+|Diese Queue enthält alle Payloads für Firebase die nicht verschlüsselt sind (plain) sind.
+
+|Firebase Encrypted
+|Diese Queue enthält alle Payloads für Firebase die verschlüsselt sind (encrypted) sind.
+|===
+
+Anmerkung:: Für jede Queue sind separate Consumer vorgesehen.

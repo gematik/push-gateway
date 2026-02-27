@@ -1,0 +1,15 @@
+{{ if .Values.postgres.enabled }}
+{{ $fullName := include "push-gateway.fullname" . }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-postgres
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ $fullName }}-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+{{ end }}

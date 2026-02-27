@@ -1,0 +1,316 @@
+## PushGatewayApi
+
+### Push multiple encrypted notifications to the gateway in a single request
+## Push multiple encrypted notifications to the gateway in a single request
+POST {{baseUrl.api}}/push/v1/notifyEncrypted/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "enc_batch_1",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_one}}",
+        "time_message_encrypted": "2023-12",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "device": {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}"
+        }
+      }
+    },
+    {
+      "id": "enc_batch_2",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_one}}",
+        "time_message_encrypted": "2023-12",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "device": {
+          "app_id": "{{apns.pushClients.two.appId}}",
+          "pushkey": "{{apns.pushClients.two.pushKey}}"
+        }
+      }
+    },
+    {
+      "id": "enc_batch_3",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_one}}",
+        "time_message_encrypted": "2023-12",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "device": {
+          "app_id": "{{firebase.pushClients.one.appId}}",
+          "pushkey": "{{firebase.pushClients.one.pushKey}}"
+        }
+      }
+    },
+    {
+      "id": "enc_batch_4",
+      "notification": {
+        "ciphertext": "{{examples.ciphertext_one}}",
+        "time_message_encrypted": "2023-12",
+        "key_identifier": "123e4567-e89b-12d3-a456-426614174000",
+        "prio": "high",
+        "device": {
+          "app_id": "{{firebase.pushClients.rejected.appId}}",
+          "pushkey": "{{firebase.pushClients.rejected.pushKey}}"
+        }
+      }
+    }
+  ]
+}
+
+
+### Push multiple plain notifications to the gateway in a single request
+## Push multiple plain notifications to the gateway in a single request
+POST {{baseUrl.api}}/push/v1/notify/batch
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notifications": [
+    {
+      "id": "batch_item_1",
+      "notification": {
+        "event_id": "event_id_1",
+        "room_id": "room_id_1",
+        "type": "m.room.message",
+        "sender": "sender_1",
+        "sender_display_name": "Sender Display Name",
+        "room_name": "Room Name",
+        "prio": "high",
+        "content": {
+          "content": "Message content"
+        },
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          },
+          {
+            "app_id": "{{apns.pushClients.two.appId}}",
+            "pushkey": "{{apns.pushClients.two.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          },
+          {
+            "app_id": "{{firebase.pushClients.one.appId}}",
+            "pushkey": "{{firebase.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "batch_item_2",
+      "notification": {
+        "event_id": "event_id_2",
+        "room_id": "room_id_2",
+        "type": "m.room.message",
+        "sender": "sender_2",
+        "sender_display_name": "Sender Display Name 2",
+        "room_name": "Room Name 2",
+        "prio": "high",
+        "content": {
+          "content": "Message content 2"
+        },
+        "counts": {
+          "unread": 1,
+          "missed_calls": 0
+        },
+        "devices": [
+          {
+            "app_id": "{{apns.pushClients.one.appId}}",
+            "pushkey": "{{apns.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          },
+          {
+            "app_id": "{{apns.pushClients.two.appId}}",
+            "pushkey": "{{apns.pushClients.two.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          },
+          {
+            "app_id": "{{apns.pushClients.noClient.appId}}",
+            "pushkey": "{{apns.pushClients.noClient.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          },
+          {
+            "app_id": "{{apns.pushClients.noProvider.appId}}",
+            "pushkey": "{{apns.pushClients.noProvider.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          },
+          {
+            "app_id": "{{apns.pushClients.rejected.appId}}",
+            "pushkey": "{{apns.pushClients.rejected.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          },
+          {
+            "app_id": "{{firebase.pushClients.one.appId}}",
+            "pushkey": "{{firebase.pushClients.one.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          },
+          {
+            "app_id": "{{firebase.pushClients.noClient.appId}}",
+            "pushkey": "{{firebase.pushClients.noClient.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          },
+          {
+            "app_id": "{{firebase.pushClients.noProvider.appId}}",
+            "pushkey": "{{firebase.pushClients.noProvider.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          },
+          {
+            "app_id": "{{firebase.pushClients.rejected.appId}}",
+            "pushkey": "{{firebase.pushClients.rejected.pushKey}}",
+            "pushkey_ts": 1634025600,
+            "data": {
+              "format": "format"
+            },
+            "tweaks": {
+              "tweak": "tweak"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
+
+### Push plain data to the gateway
+## Push plain data to the gateway
+POST {{baseUrl.api}}/push/v1/notify
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notification": {
+      "event_id": "event_id",
+      "room_id": "room_id",
+      "type": "type",
+      "sender": "sender",
+      "sender_display_name": "sender_display_name",
+      "room_name": "room_name",
+      "room_alias": "room_alias",
+      "user_is_target": true,
+      "prio": "high",
+      "content": {
+        "content": "content"
+      },
+      "counts": {
+        "unread": 1,
+        "missed_calls": 0
+      },
+      "devices": [
+        {
+          "app_id": "{{apns.pushClients.one.appId}}",
+          "pushkey": "{{apns.pushClients.one.pushKey}}"
+        },
+        {
+          "app_id": "{{apns.pushClients.two.appId}}",
+          "pushkey": "{{apns.pushClients.two.pushKey}}"
+        },
+        {
+          "app_id": "{{apns.pushClients.noClient.appId}}",
+          "pushkey": "{{apns.pushClients.noClient.pushKey}}"
+        },
+        {
+          "app_id": "{{apns.pushClients.noProvider.appId}}",
+          "pushkey": "{{apns.pushClients.noProvider.pushKey}}"
+        },
+        {
+          "app_id": "{{apns.pushClients.rejected.appId}}",
+          "pushkey": "{{apns.pushClients.rejected.pushKey}}"
+        },
+        {
+          "app_id": "{{firebase.pushClients.one.appId}}",
+          "pushkey": "{{firebase.pushClients.one.pushKey}}"
+        },
+        {
+          "app_id": "{{firebase.pushClients.noClient.appId}}",
+          "pushkey": "{{firebase.pushClients.noClient.pushKey}}"
+        },
+        {
+          "app_id": "{{firebase.pushClients.noProvider.appId}}",
+          "pushkey": "{{firebase.pushClients.noProvider.pushKey}}"
+        },
+        {
+          "app_id": "{{firebase.pushClients.rejected.appId}}",
+          "pushkey": "{{firebase.pushClients.rejected.pushKey}}"
+        }
+      ]
+    }
+}

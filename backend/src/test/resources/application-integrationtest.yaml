@@ -1,0 +1,22 @@
+spring:
+  artemis:
+    mode: embedded
+    embedded:
+      enabled: true
+      persistent: false
+      queues:
+        - "pending.notifications.apns.plain"
+        - "pending.notifications.apns.encrypted"
+        - "pending.notifications.firebase.plain"
+        - "pending.notifications.firebase.encrypted"
+
+zonky:
+  test:
+    database:
+      provider: zonky
+
+logging:
+  level:
+    root: DEBUG
+    org.hibernate.sql: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

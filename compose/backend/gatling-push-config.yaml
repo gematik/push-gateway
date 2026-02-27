@@ -1,0 +1,27 @@
+push:
+  apns:
+    - enabled: true
+      server: "api.sandbox.push.apple.com"
+      bundleId: "de.gematik.alpha.gatling"
+      authMethod: CERTIFICATE # OR TOKEN
+      certificateAuth:
+        certificatePath: "file:/app/config/apns/de.gematik.alpha.gatling.p12.dummy"
+        passwordPath: "file:/app/config/apns/de.gematik.alpha.gatling.p12.dummy.password"
+      receivingAppIds:
+        - "de.gematik.alpha.gatling.apns"
+    - enabled: true
+      server: "api.sandbox.push.apple.com"
+      bundleId: "de.gematik.beta.gatling"
+      authMethod: TOKEN # OR CERTIFICATE
+      tokenAuth:
+        token: "file:/app/config/apns/AuthKey_GATLING.p8.dummy"
+        keyId: "KID"
+        teamId: "TID"
+      receivingAppIds:
+        - "de.gematik.beta.gatling.apns"
+  firebase:
+    - enabled: true
+      projectId: "de-gematik-gatling"
+      credentialsPath: "file:/app/config/firebase/de-gematik-gatling.json.dummy"
+      receivingAppIds:
+        - "de-gematik-gatling.firebase"

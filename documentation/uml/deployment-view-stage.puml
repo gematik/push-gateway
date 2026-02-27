@@ -1,0 +1,63 @@
+@startuml
+
+top to bottom direction
+skinparam linetype ortho
+
+rectangle "Infrastruktur" as infra {
+
+    port "Fachdienst" as fd
+    port "Persistence" as db
+    port "Push-Provider" as pp
+
+    node "Node 0" <<Worker>> as node0 {
+        rectangle "OS" <<OperatingSystem>> as osNode0 {
+            component "Load Balancer" as lb
+        }
+    }
+
+    node "REST-Api-Server" <<Worker>> as node1 {
+        rectangle "OS" <<OperatingSystem>> as osNode1 {
+            rectangle "Docker" <<ExecutionEnvironment>> as docker1 {
+                component "Push-Gateway" <<Container>> as container1 {
+                    rectangle "Java Runtime Environment" <<ExecutionEnvironment>> as java1 {
+                        file "push-gw.jar" <<artifact,executable>> as exe1
+                    }
+                }
+            }
+        }
+    }
+
+    node "JMS Broker" <<Worker>> as node2 {
+        rectangle "OS" <<OperatingSystem>> as osNode2 {
+            rectangle "Docker" <<ExecutionEnvironment>> as docker2 {
+                component "JMS Broker" <<Container>> as container2 {
+                    rectangle "Java Runtime Environment" <<ExecutionEnvironment>> as java2 {
+                        file "artemis.jar" <<artifact,executable>> as exe2
+                    }
+                }
+            }
+        }
+    }
+
+    node "JMS Consumer" <<Worker>> as node3 {
+        rectangle "OS" <<OperatingSystem>> as osNode3 {
+            rectangle "Docker" <<ExecutionEnvironment>> as docker3 {
+                component "Push-Gateway" <<Container>> as container3 {
+                    rectangle "Java Runtime Environment" <<ExecutionEnvironment>> as java3 {
+                        file "push-gw.jar" <<artifact,executable>> as exe3
+                    }
+                }
+            }
+        }
+    }
+
+    fd --> lb
+    lb --> container1
+    container1 -r-> container2
+    container1 --> db
+    container2 <-r- container3
+    container3 --> pp
+
+}
+
+@enduml

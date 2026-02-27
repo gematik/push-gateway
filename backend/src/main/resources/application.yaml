@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: Push-Gateway
+    version: "@project.version@"
+  artemis:
+    mode: native
+    user: "${JMS_BROKER_USERNAME:artemis}"
+    password: "${JMS_BROKER_PASSWORD:secret}"
+    broker-url: "${JMS_BROKER_URL:tcp://artemis:61616}"
+  jms:
+    listener:
+      auto-startup: true
+  config:
+    import: ${PUSH_CONFIG_FILE:classpath:push-config.yaml}
+  datasource:
+    url: "${POSTGRES_URL:jdbc:postgresql://db:5432/push-gateway-db}"
+    username: "${POSTGRES_USERNAME:push-gateway}"
+    password: "${POSTGRES_PASSWORD:password}"
+  jpa:
+    open-in-view: false
+
+  flyway:
+    locations:
+      - classpath:db/migration
+
+app:
+  mode: "${APP_MODE:BOTH}"
+
+gatling:
+  enabled: ${GATLING_ENABLED:false}
+
+server:
+  port: 8080
+
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  endpoint:
+    health:
+      access: unrestricted
+      probes:
+        enabled: true
+    prometheus:
+      access: unrestricted
+    metrics:
+      access: unrestricted
+logging:
+  level:
+    root: ${LOG_LEVEL:DEBUG}

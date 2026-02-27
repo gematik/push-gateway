@@ -1,0 +1,72 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+.kotlin
+
+### IntelliJ IDEA ###
+.idea/*
+!.idea/
+!.idea/ktfmt.xml
+**/*.iws
+**/*.iml
+**/*.ipr
+**/*.log.gz
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+# Token, Zertifikate, Push-Config
+compose/backend/apns/*.p12
+compose/backend/apns/*.p8
+compose/backend/apns/*.pem
+compose/backend/firebase/*.json
+compose/backend/private-push-config.yaml
+compose/artemis/data
+compose/artemis/lib
+compose/artemis/lock
+compose/artemis/log
+compose/artemis/tmp
+
+**/http-client.private.env.json
+
+# local chart values
+charts/values/local.yaml
+
+secrets
+
+# documentation build output
+docs/site/
+
+# terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+crash.log
+*.tfplan
+tfplan-*
+devops/
+charts/values/values-*
+

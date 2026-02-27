@@ -1,0 +1,35 @@
+### GET Liveness
+GET {{baseUrl.management}}/actuator/health/liveness
+
+### GET Readiness
+GET {{baseUrl.management}}/actuator/health/readiness
+
+### GET Metrics
+GET {{baseUrl.management}}/actuator/metrics
+
+### GET JVM Metrics: CPU usage
+GET {{baseUrl.management}}/actuator/metrics/system.cpu.usage
+
+### GET JVM Metrics: Memory used
+GET {{baseUrl.management}}/actuator/metrics/jvm.memory.used
+
+### GET JVM Metrics: Memory max
+GET {{baseUrl.management}}/actuator/metrics/jvm.memory.max
+
+### GET APNS Metrics: Accepted Notifications
+GET {{baseUrl.management}}/actuator/metrics/notifications.accepted
+
+### GET APNS Metrics: Failed Notifications
+GET {{baseUrl.management}}/actuator/metrics/notifications.failed
+
+### GET APNS Metrics: Rejected Notifications
+GET {{baseUrl.management}}/actuator/metrics/notifications.rejected
+
+### GET APNS Metrics: Sent Notifications
+GET {{baseUrl.management}}/actuator/metrics/notifications.sent
+
+### GET APNS Metrics: Sent Notifications Timer
+GET {{baseUrl.management}}/actuator/metrics/notifications.sent.timer
+
+### GET Prometheus
+GET {{baseUrl.management}}/actuator/prometheus

@@ -1,0 +1,18 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-glossary]]
+== Glossar
+
+[cols="e,2e" options="header"]
+|===
+|Begriff |Definition
+
+|Push-Gateway
+|Die Anwendung, die in diesem Dokument beschrieben ist
+
+|Push-Notification
+|Optional verschlüsselter Payload, der von Fachdiensten an das Push-Gateway gesendet wird, welches den Payload an unterstützte Push-Provider weiterleitet
+
+|Push-Provider
+|Als Blackbox zu betrachtendes Fremdsystem, was für die Zustellung von Push-Notifications auf Endgeräte verwendet wird, jedoch keine Garantie gibt, dass dies auch tatsächlich stattfindet
+|===

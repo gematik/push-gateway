@@ -1,0 +1,26 @@
+@startuml
+
+component "JMS-Broker"" <<System>> as broker {
+
+    left to right direction
+    queue "APNS Plain" as apns_plain
+    queue "APNS Encrypted" as apns_enc
+    queue "Firebase Plain" as firebase_plain
+    queue "Firebase Encrypted" as firebase_enc
+
+    port "Producer" as portProducer
+    port "Consumer" as portConsumer
+}
+
+' connections
+portProducer --> apns_plain
+portProducer --> apns_enc
+portProducer --> firebase_plain
+portProducer --> firebase_enc
+
+apns_plain --> portConsumer
+apns_enc --> portConsumer
+firebase_plain --> portConsumer
+firebase_enc --> portConsumer
+
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+
+!pragma teoz true
+
+participant "Fachdienst" as fd
+participant "Backend" as backend
+participant "Broker" as broker
+participant "Push-Provider" as pp
+participant "Push-Receiver" as device
+
+{Start} fd -> backend : POST /notify
+activate fd
+activate backend
+backend -> backend: evaluate payload
+backend -> backend: filter eligible devices
+alt Eligible devices left
+    backend -> backend: create JMS message
+    backend -> broker: send JMS message
+    activate broker
+    backend -> fd: Send response
+else No eligible devices left
+    backend -> fd: Send response
+    deactivate fd
+    deactivate backend
+end
+
+group loop (while not delivered to Push-Provider)
+    broker -> backend: publish JMS message
+
+    activate backend
+    backend -> backend: convert to Push request
+    backend -> pp: send Push request
+    activate pp
+    alt Request accepted
+        backend -> broker: send ack
+        {End} pp --> device: Deliver Push notification
+        deactivate pp
+    else Request failed
+        alt Retry sensible
+            backend -> broker: schedule retry
+        else Retry not sensible
+            backend -> broker: send ack
+            deactivate backend
+        end
+        deactivate broker
+'        broker -> broker: discard JMS message
+    end
+end
+' {Start} <-> {End} : {10.000 requests per hour}
+
+
+@enduml

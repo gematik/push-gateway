@@ -1,0 +1,26 @@
+@startmindmap
+
+<style>
+mindmapDiagram {
+    node {
+        BackgroundColor white
+    }
+    :depth(3) {
+        BackgroundColor lightgray
+    }
+}
+</style>
+
++ Qualität Push-Gateway
+
+++ Funktionale Eignung
++++ Vollständigkeit
+++++ FEVO01
++++ Korrektheit
+++++ FEKO01
+
+++ Effizienz
++++ Zeitverhalten
+++++ EFZV01
+
+@endmindmap

@@ -1,0 +1,97 @@
+name: "push-gateway"
+
+services:
+  backend:
+    container_name: pgw_backend
+    build:
+      context: ./backend/target
+      args:
+        - JAR_FILE=./backend-*-standalone.jar
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "5005:5005"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+    depends_on:
+      jaeger-service:
+        condition: service_started
+      artemis:
+        condition: service_started
+      db:
+        condition: service_healthy
+    environment:
+      APP_MODE: BOTH
+      LOG_LEVEL: INFO
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005" # for remote debugging on 5005
+      OTEL_LOGS_EXPORTER: none
+      OTEL_METRICS_EXPORTER: none
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-service:4318
+      OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=docker-compose"
+      OTEL_SERVICE_NAME: "push-gateway"
+      JMS_PERSISTENCE_ENABLED: false
+      PUSH_CONFIG_FILE: file:/app/config/private-push-config.yaml
+    volumes:
+      - ./compose/backend/:/app/config/
+    networks:
+      - default
+      - gematik-network
+
+  artemis:
+    image: apache/activemq-artemis:latest
+    environment:
+      ARTEMIS_USER: artemis
+      ARTEMIS_PASSWORD: secret
+    ports:
+      - "61616:61616"   # JMS (Core)
+      - "5672:5672"     # AMQP
+      - "8161:8161"     # Web Console
+    volumes:
+      - ./compose/artemis:/var/lib/artemis-instance
+    networks:
+      - default
+      - gematik-network
+
+  db:
+    image: ghcr.io/cloudnative-pg/postgresql:16.1
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: push-gateway-db
+      POSTGRES_USER: push-gateway
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready -U push-gateway -d push-gateway-db
+      interval: 3s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - default
+      - gematik-network
+
+  jaeger-service:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "14250"
+    networks:
+      - default
+      - gematik-network
+
+networks:
+  gematik-network:
+    name: gematik-network
+    external: true
+
+volumes:
+  postgres_data:

@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "push-gateway.fullname" . }}-broker
+  labels:
+    {{ include "push-gateway.broker.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{ include "push-gateway.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{ include "push-gateway.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: push-gateway-broker
+      containers:
+        - name: {{ .Chart.Name }}-broker
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.jms.broker.image.repository }}:{{ .Values.jms.broker.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.jms.broker.image.pullPolicy }}
+          env:
+            - name: "ARTEMIS_USER"
+              valueFrom:
+                secretKeyRef:
+                  name: "broker-credentials"
+                  key: "username"
+            - name: "ARTEMIS_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "broker-credentials"
+                  key: "password"
+          ports:
+            - name: service
+              containerPort: 61616
+              protocol: TCP
+            - name: amqp
+              containerPort: 5672
+              protocol: TCP
+            - name: http
+              containerPort: 8161
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 61616
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 5
+          resources:
+            {{ toYaml .Values.jms.broker.resources | nindent 12 }}
+          volumeMounts:
+            - name: "broker-journal"
+              mountPath: "/var/lib/artemis-instance"
+              readOnly: false
+            - name: "broker-xml"
+              mountPath: "/var/lib/artemis-config"
+              readOnly: true
+            - name: "tmp"
+              mountPath: "/tmp"
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+
+              # Initialize Artemis broker instance on first start
+              if [ ! -f "/var/lib/artemis-instance/bin/artemis" ]; then
+                echo "Initializing Artemis broker instance..."
+                /opt/activemq-artemis/bin/artemis create /var/lib/artemis-instance \
+                  --user "${ARTEMIS_USER}" \
+                  --password "${ARTEMIS_PASSWORD}" \
+                  --allow-anonymous
+              else
+                echo "Artemis broker instance already initialized."
+              fi
+
+              # Apply broker configuration from ConfigMap, if present
+              if [ -f "/var/lib/artemis-config/broker.xml" ]; then
+                echo "Copying broker.xml from ConfigMap into instance..."
+                cp /var/lib/artemis-config/broker.xml /var/lib/artemis-instance/etc/broker.xml
+              fi
+
+              echo "Starting Artemis broker..."
+              /var/lib/artemis-instance/bin/artemis run
+      volumes:
+        - name: broker-journal
+          persistentVolumeClaim:
+            claimName: erezeptapp-pushgw-artemis-volume
+        - name: "broker-xml"
+          configMap:
+            name: {{ include "push-gateway.fullname" . }}-broker-config
+        - name: "tmp"
+          emptyDir: {}

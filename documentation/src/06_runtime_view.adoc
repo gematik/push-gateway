@@ -1,0 +1,41 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-runtime-view]]
+== Laufzeitsicht
+Die Abbildung <<runtime_view_combined>> zeigt die Verarbeitung von Fachdienst-Requests bis hin zur Zustellung der daraus resultierenden Push-Notification an Endgeräte.
+
+[[runtime_view_combined]]
+[plantuml,runtimeview_combined,svg,align="center",scale=95]
+.Laufzeitsicht
+....
+include::../uml/runtime-view-combined.puml[]
+....
+
+=== Komplikationsloser Durchlauf
+Die Abbildung <<runtime_view_success>> zeigt die Verarbeitung von Fachdienst-Requests unter der Annahme, dass keine Fehler auftreten.
+
+[[runtime_view_success]]
+[plantuml,runtimeview_success,svg,align="center",scale=95]
+.Laufzeitsicht im Erfolgsfall
+....
+include::../uml/runtime-view-success.puml[]
+....
+
+=== Durchlauf mit Retry
+Die Abbildung <<runtime_view_with_retry>> zeigt die Verarbeitung von Fachdienst-Requests unter der Annahme, dass Retries notwendig sind.
+
+[[runtime_view_with_retry]]
+[plantuml,runtimeview_retry,svg,align="center",scale=95]
+.Laufzeitsicht im Fehlerfall mit Retry
+....
+include::../uml/runtime-view-failure-with-retry.puml[]
+....
+
+=== Durchlauf ohne Retry
+Die Abbildung <<runtime_view_without_retry>> zeigt die Verarbeitung von Fachdienst-Requests unter der Annahme, dass Retries nicht sinnvoll sind.
+[[runtime_view_without_retry]]
+[plantuml,runtimeview_no_retry,svg,align="center",scale=95]
+.Laufzeitsicht im Fehlerfall ohne Retry
+....
+include::../uml/runtime-view-failure-without-retry.puml[]
+....

@@ -1,0 +1,18 @@
+[[section-bibliography]]
+= Quellenverzeichnis
+
+- [[[spec]]] https://gemspec.gematik.de/docs/gemF/gemF_PushNotification/gemF_PushNotification_V1.1.0/#5.2[gemF_PushNotification, Version 1.1.0, Kapitel 5.2]
+- [[[concept]]] https://gematik.github.io/gem-push-notifications-concept/[gematik Konzept Push Notifications]
+- [[[openapi]]] https://github.com/gematik/gem-push-notifications-concept/blob/main/docs_sources/push_gateway_openapi.yaml[OpenAPI Push-Gateway]
+- [[[A_27164]]] https://gemspec.gematik.de/docs/gemF/gemF_PushNotification/gemF_PushNotification_V1.1.0/#A_27164[A_27164 - Push Gateway - OpenApi_Notification_PushGateway]
+- [[[A_27165-01]]] https://gemspec.gematik.de/docs/gemF/gemF_PushNotification/gemF_PushNotification_V1.1.0/#A_27165-01[A_27165-01 - Push Gateway - Push Notification senden – Aufruf Push Provider]
+- [[[A_27512]]] https://gemspec.gematik.de/docs/gemF/gemF_PushNotification/gemF_PushNotification_V1.1.0/#A_27512[A_27512 - Push Gateway - Direkte Kommunikation mit Push Provider]
+- [[[A_27539]]] https://gemspec.gematik.de/docs/gemF/gemF_PushNotification/gemF_PushNotification_V1.1.0/#A_27539[A_27539 - Push Gateway - Keine Verarbeitung unverschlüsselter personenbezogener Daten]
+- [[[A_27611]]] https://gemspec.gematik.de/docs/gemF/gemF_PushNotification/gemF_PushNotification_V1.1.0/#A_27611[A_27611 - Push Gateway - Keine Rückschlüsse auf genutzte Anwendungen]
+- [[[A_27435]]] https://gemspec.gematik.de/docs/gemF/gemF_PushNotification/gemF_PushNotification_V1.1.0/#A_27435[A_27435 - Push Gateway – Unverzügliches Löschen von Push Notification]
+- [[[A_27757]]] https://gemspec.gematik.de/docs/gemF/gemF_PushNotification/gemF_PushNotification_V1.1.0/#A_27757[A_27757 - Push Gateway – Maximal-Frist für Push Notifications im Push Gateway]
+- [[[A_27167]]] https://gemspec.gematik.de/docs/gemF/gemF_PushNotification/gemF_PushNotification_V1.1.0/#A_27167[A_27167 - Push Gateway - Prio Feld mappen]
+- [[[iso25010]]] https://inztitut.de/blog/glossar/iso-25010[Qualitätsziele nach ISO25010]
+- [[[lib_arrow]]] https://github.com/arrow-kt/arrow[Library Arrow]
+- [[[functional_error_handling]]] https://blog.spree.de/2024/09/14/handling-errors-functionally-with-either/[Handling Errors Functionally with Either – A Detailed Guide]
+- [[[postgresql-iso9075-conformance]]] https://www.postgresql.org/docs/current/features.html
