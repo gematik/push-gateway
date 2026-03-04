@@ -35,7 +35,7 @@ jobs:
           ruby-version: '3.3'
 
       - name: Install Asciidoctor & diagram extension
-        run: gem install asciidoctor asciidoctor-diagram
+        run: gem install asciidoctor asciidoctor-diagram asciidoctor-diagram-plantuml
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

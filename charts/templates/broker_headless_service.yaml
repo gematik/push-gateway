@@ -1,0 +1,21 @@
+{{ $fullName := include "push-gateway.fullname" . }}
+---
+# Headless Service for StatefulSet pod discovery and broker-to-broker replication.
+# publishNotReadyAddresses ensures DNS records exist for backup pods that are
+# not yet ready (their acceptors are not started until failover).
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-broker-headless
+  labels:
+    {{- include "push-gateway.broker.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - port: 61616
+      targetPort: service
+      protocol: TCP
+      name: service
+  selector:
+    {{- include "push-gateway.broker.selectorLabels" . | nindent 4 }}

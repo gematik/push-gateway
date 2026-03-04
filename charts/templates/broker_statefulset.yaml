@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "push-gateway.fullname" . }}-broker
+  labels:
+    {{ include "push-gateway.broker.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "push-gateway.fullname" . }}-broker-headless
+  replicas: {{ .Values.jms.broker.replicaCount | default 2 }}
+  podManagementPolicy: OrderedReady
+  selector:
+    matchLabels:
+      {{ include "push-gateway.broker.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{ include "push-gateway.broker.selectorLabels" . | nindent 8 }}
+    spec:
+      terminationGracePeriodSeconds: 120
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: push-gateway-broker
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{ include "push-gateway.broker.selectorLabels" . | nindent 20 }}
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: {{ .Chart.Name }}-broker
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.jms.broker.image.repository }}:{{ .Values.jms.broker.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.jms.broker.image.pullPolicy }}
+          env:
+            - name: "ARTEMIS_USER"
+              valueFrom:
+                secretKeyRef:
+                  name: "broker-credentials"
+                  key: "username"
+            - name: "ARTEMIS_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "broker-credentials"
+                  key: "password"
+          ports:
+            - name: service
+              containerPort: 61616
+              protocol: TCP
+            - name: amqp
+              containerPort: 5672
+              protocol: TCP
+            - name: http
+              containerPort: 8161
+              protocol: TCP
+          # Readiness: only the live broker opens the acceptor on 61616.
+          # The backup does NOT start acceptors until failover, so it stays not-ready
+          # and the client-facing Service routes traffic only to the live broker.
+          readinessProbe:
+            tcpSocket:
+              port: 61616
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 5
+          # Liveness: use the web console port (8161) which is started on both
+          # live and backup brokers, preventing K8s from killing the standby pod.
+          livenessProbe:
+            tcpSocket:
+              port: 8161
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 6
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/bash
+                  - -c
+                  - /var/lib/artemis-instance/bin/artemis stop
+          resources:
+            {{ toYaml .Values.jms.broker.resources | nindent 12 }}
+          volumeMounts:
+            - name: "broker-journal"
+              mountPath: "/var/lib/artemis-instance"
+              readOnly: false
+            - name: "broker-xml"
+              mountPath: "/var/lib/artemis-config"
+              readOnly: true
+            - name: "tmp"
+              mountPath: "/tmp"
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+
+              # Determine broker role from StatefulSet ordinal
+              ORDINAL=${HOSTNAME##*-}
+
+              # Initialize Artemis broker instance on first start
+              if [ ! -f "/var/lib/artemis-instance/bin/artemis" ]; then
+                echo "Initializing Artemis broker instance..."
+                /opt/activemq-artemis/bin/artemis create /var/lib/artemis-instance \
+                  --user "${ARTEMIS_USER}" \
+                  --password "${ARTEMIS_PASSWORD}" \
+                  --allow-anonymous
+              else
+                echo "Artemis broker instance already initialized."
+              fi
+
+              # Select HA config based on ordinal: 0 = primary (live), 1 = backup
+              if [ "$ORDINAL" = "0" ]; then
+                CONFIG_FILE="broker-live.xml"
+                echo "Configuring as PRIMARY (live) broker..."
+              else
+                CONFIG_FILE="broker-backup.xml"
+                echo "Configuring as BACKUP broker..."
+              fi
+
+              if [ -f "/var/lib/artemis-config/${CONFIG_FILE}" ]; then
+                echo "Copying ${CONFIG_FILE} into instance..."
+                cp "/var/lib/artemis-config/${CONFIG_FILE}" /var/lib/artemis-instance/etc/broker.xml
+                # Inject cluster credentials from Secret
+                sed -i "s|__CLUSTER_USER__|${ARTEMIS_USER}|g" /var/lib/artemis-instance/etc/broker.xml
+                sed -i "s|__CLUSTER_PASSWORD__|${ARTEMIS_PASSWORD}|g" /var/lib/artemis-instance/etc/broker.xml
+              fi
+
+              # Bind web console to 0.0.0.0 so the liveness probe (kubelet TCP check) can reach it
+              if [ -f "/var/lib/artemis-instance/etc/bootstrap.xml" ]; then
+                sed -i 's|uri="http://localhost:8161"|uri="http://0.0.0.0:8161"|g' /var/lib/artemis-instance/etc/bootstrap.xml
+              fi
+
+              echo "Starting Artemis broker..."
+              /var/lib/artemis-instance/bin/artemis run
+      volumes:
+        - name: "broker-xml"
+          configMap:
+            name: {{ include "push-gateway.fullname" . }}-broker-config
+        - name: "tmp"
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: broker-journal
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: {{ .Values.jms.broker.storage.storageClassName | default "standard" }}
+        resources:
+          requests:
+            storage: {{ .Values.jms.broker.storage.size | default "1Gi" }}
