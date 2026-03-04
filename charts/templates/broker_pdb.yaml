@@ -1,0 +1,15 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "push-gateway.fullname" . }}-broker
+  labels:
+    {{- include "push-gateway.broker.labels" . | nindent 4 }}
+spec:
+  # Use maxUnavailable instead of minAvailable because the backup broker
+  # is intentionally not-ready (acceptors not started until failover).
+  # minAvailable: 1 would block draining the primary node since only
+  # 1 pod is ever "ready".
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      {{- include "push-gateway.broker.selectorLabels" . | nindent 6 }}

@@ -22,4 +22,4 @@ spec:
       protocol: TCP
       name: service
   selector:
-    {{- include "push-gateway.selectorLabels" . | nindent 4 }}
+    {{- include "push-gateway.broker.selectorLabels" . | nindent 4 }}

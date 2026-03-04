@@ -61,6 +61,7 @@ consumer:
 #######
 jms:
   broker:
+    replicaCount: 2
     host: ""
     port: 61616
     image:
@@ -74,6 +75,9 @@ jms:
       requests:
         memory: 1024M
         cpu: 200m
+    storage:
+      size: 1Gi
+      storageClassName: standard
 
 ##############
 # PostgreSQL #

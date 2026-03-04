@@ -47,6 +47,12 @@ if ! ruby -e "require 'asciidoctor-diagram'" &>/dev/null 2>&1; then
     MISSING=1
 fi
 
+# asciidoctor-diagram-plantuml is a Ruby gem loaded at runtime; verify it's available
+if ! gem list -i asciidoctor-diagram-plantuml > /dev/null 2>&1; then
+    error "'asciidoctor-diagram-plantuml' gem not found.  Install with: gem install asciidoctor-diagram-plantuml"
+    MISSING=1
+fi
+
 if [[ "${SKIP_API:-}" != "1" ]]; then
     check_tool npx "Install Node.js / npm to get npx (needed for OpenAPI docs)" || MISSING=1
 fi

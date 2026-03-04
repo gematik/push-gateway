@@ -1,24 +1,56 @@
+{{ $fullName := include "push-gateway.fullname" . }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "push-gateway.fullname" . }}-broker-config
+  name: {{ $fullName }}-broker-config
 data:
-  broker.xml: |-
+  # ──────────────────────────────────────────────────────────────
+  # PRIMARY (live) broker – selected by startup script for ordinal 0
+  # ──────────────────────────────────────────────────────────────
+  broker-live.xml: |-
     <?xml version="1.0" encoding="UTF-8"?>
     <configuration xmlns="urn:activemq:core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="urn:activemq:core http://activemq.apache.org/schema/core">
-
-        <!-- Basis-Broker-Konfiguration -->
         <core>
             <name>artemis-broker</name>
             <persistence-enabled>true</persistence-enabled>
             <journal-type>NIO</journal-type>
             <security-enabled>true</security-enabled>
 
-            <!-- Acceptor für JMS -->
+            <!-- Cluster credentials – placeholders replaced by startup script -->
+            <cluster-user>__CLUSTER_USER__</cluster-user>
+            <cluster-password>__CLUSTER_PASSWORD__</cluster-password>
+
+            <!-- Connectors for cluster topology (headless-service DNS) -->
+            <connectors>
+                <connector name="live-connector">tcp://{{ $fullName }}-broker-0.{{ $fullName }}-broker-headless:61616</connector>
+                <connector name="backup-connector">tcp://{{ $fullName }}-broker-1.{{ $fullName }}-broker-headless:61616</connector>
+            </connectors>
+
+            <!-- Client acceptor -->
             <acceptors>
                 <acceptor name="artemis">tcp://0.0.0.0:61616</acceptor>
             </acceptors>
+
+            <!-- Cluster connection – primary identity, connects to backup -->
+            <cluster-connections>
+                <cluster-connection name="push-cluster">
+                    <connector-ref>live-connector</connector-ref>
+                    <message-load-balancing>ON_DEMAND</message-load-balancing>
+                    <static-connectors>
+                        <connector-ref>backup-connector</connector-ref>
+                    </static-connectors>
+                </cluster-connection>
+            </cluster-connections>
+
+            <!-- HA: shared-nothing replication – this node is the primary -->
+            <ha-policy>
+                <replication>
+                    <primary>
+                        <check-for-active-server>true</check-for-active-server>
+                    </primary>
+                </replication>
+            </ha-policy>
 
             <!-- Benutzerdefinierte Queues -->
             <addresses>
@@ -62,6 +94,98 @@ data:
                     <permission type="consume" roles="amq"/>
                 </security-setting>
             </security-settings>
+        </core>
+    </configuration>
 
+  # ──────────────────────────────────────────────────────────────
+  # BACKUP broker – selected by startup script for ordinal 1
+  # ──────────────────────────────────────────────────────────────
+  broker-backup.xml: |-
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration xmlns="urn:activemq:core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="urn:activemq:core http://activemq.apache.org/schema/core">
+        <core>
+            <name>artemis-broker</name>
+            <persistence-enabled>true</persistence-enabled>
+            <journal-type>NIO</journal-type>
+            <security-enabled>true</security-enabled>
+
+            <!-- Cluster credentials – placeholders replaced by startup script -->
+            <cluster-user>__CLUSTER_USER__</cluster-user>
+            <cluster-password>__CLUSTER_PASSWORD__</cluster-password>
+
+            <!-- Connectors for cluster topology (headless-service DNS) -->
+            <connectors>
+                <connector name="live-connector">tcp://{{ $fullName }}-broker-0.{{ $fullName }}-broker-headless:61616</connector>
+                <connector name="backup-connector">tcp://{{ $fullName }}-broker-1.{{ $fullName }}-broker-headless:61616</connector>
+            </connectors>
+
+            <!-- Client acceptor – NOT started by Artemis until this backup activates -->
+            <acceptors>
+                <acceptor name="artemis">tcp://0.0.0.0:61616</acceptor>
+            </acceptors>
+
+            <!-- Cluster connection – backup identity, connects to primary -->
+            <cluster-connections>
+                <cluster-connection name="push-cluster">
+                    <connector-ref>backup-connector</connector-ref>
+                    <message-load-balancing>ON_DEMAND</message-load-balancing>
+                    <static-connectors>
+                        <connector-ref>live-connector</connector-ref>
+                    </static-connectors>
+                </cluster-connection>
+            </cluster-connections>
+
+            <!-- HA: shared-nothing replication – this node is the backup -->
+            <ha-policy>
+                <replication>
+                    <backup>
+                        <allow-failback>true</allow-failback>
+                    </backup>
+                </replication>
+            </ha-policy>
+
+            <!-- Benutzerdefinierte Queues -->
+            <addresses>
+                <address name="pending.notifications.apns.plain">
+                    <anycast>
+                        <queue name="pending.notifications.apns.plain"/>
+                    </anycast>
+                </address>
+                <address name="pending.notifications.apns.encrypted">
+                    <anycast>
+                        <queue name="pending.notifications.apns.encrypted"/>
+                    </anycast>
+                </address>
+                <address name="pending.notifications.firebase.plain">
+                    <anycast>
+                        <queue name="pending.notifications.firebase.plain"/>
+                    </anycast>
+                </address>
+                <address name="pending.notifications.firebase.encrypted">
+                    <anycast>
+                        <queue name="pending.notifications.firebase.encrypted"/>
+                    </anycast>
+                </address>
+            </addresses>
+
+            <address-settings>
+                <address-setting match="#">
+                    <auto-create-queues>false</auto-create-queues>
+                    <auto-create-addresses>false</auto-create-addresses>
+                    <dead-letter-address>none</dead-letter-address>
+                    <!-- Supports A_27757 - Push Gateway – Maximal-Frist für Push Notifications im Push Gateway
+                         by making retries every minute but limiting to 1.440 retries (that is 24 hours) -->
+                    <max-delivery-attempts>1440</max-delivery-attempts>
+                    <redelivery-delay>60000</redelivery-delay>
+                </address-setting>
+            </address-settings>
+
+            <security-settings>
+                <security-setting match="#">
+                    <permission type="send" roles="amq"/>
+                    <permission type="consume" roles="amq"/>
+                </security-setting>
+            </security-settings>
         </core>
     </configuration>
